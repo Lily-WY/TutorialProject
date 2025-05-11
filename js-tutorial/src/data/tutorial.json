@@ -1,0 +1,12 @@
+[
+    { "title": "JavaScript 简介", "path": "introduction" },
+    { "title": "变量与常量", "path": "variables" },
+    { "title": "函数", "path": "functions" },
+    { "title": "数组", "path": "arrays" },
+    { "title": "对象", "path": "objects" },
+    { "title": "循环", "path": "loops" },
+    { "title": "条件语句", "path": "conditions" },
+    { "title": "事件处理", "path": "events" },
+    { "title": "DOM 操作", "path": "domManipulation" }
+  ]
+  
