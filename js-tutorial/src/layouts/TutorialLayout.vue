@@ -1,65 +1,25 @@
 <template>
-    <Suspense>
-        <component :is="component" />
-    </Suspense>
-    <el-container style="height: 100vh;">
-        <!-- 左侧边栏 -->
-        <el-aside width="260px" class="sidebar">
-            <el-scrollbar>
-                <el-menu class="el-menu-vertical" :default-active="currentSection" router>
-                    <el-menu-item v-for="item in chapters" :key="item.path" :index="`/tutorial/${item.path}`">
-                        {{ item.title }}
-                    </el-menu-item>
-                </el-menu>
-            </el-scrollbar>
-        </el-aside>
+    <div class="common-layout">
+        <el-container class="header">
+            <!-- 导入的 Header 组件 -->
+            <Header />
 
-        <!-- 右侧内容 -->
-        <el-container>
-            <el-header class="header">
-                <h2>JavaScript 教程</h2>
-            </el-header>
-            <el-main class="main">
-                <router-view />
-            </el-main>
+            <!-- <el-container>
+        <el-aside width="200px">Aside</el-aside>
+        <el-main>Main</el-main>
+      </el-container> -->
         </el-container>
-    </el-container>
+    </div>
 </template>
 
 <script setup>
-import { defineAsyncComponent } from 'vue'
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-
-
-
-// 读取当前路径的 section 参数
-const route = useRoute()
-const section = computed(() => route.params.section)
-
-// 动态加载对应教程组件
-const component = computed(() => {
-    if (!section.value) return null
-    const name = section.value.charAt(0).toUpperCase() + section.value.slice(1)
-    return defineAsyncComponent(() => import(`@/pages/tutorial/${name}.vue`))
-})
+import Header from '@/components/Header.vue' // 确保路径正确
 </script>
 
 <style scoped>
-.sidebar {
-    background-color: #f8f9fa;
-    border-right: 1px solid #ddd;
-}
+  .common-layout {
+      height: 100vh;
+    }
+  
 
-.header {
-    padding: 16px;
-    border-bottom: 1px solid #eee;
-    background-color: #ffffff;
-}
-
-.main {
-    padding: 24px;
-    overflow-y: auto;
-    background-color: #fff;
-}
 </style>
