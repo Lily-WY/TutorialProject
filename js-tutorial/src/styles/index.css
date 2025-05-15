@@ -1,0 +1,11 @@
+* {
+  font-family: "宋体", "SimSun", "Times New Roman", Times, serif;
+}
+
+/* index.css */
+.el-theme-dark body, 
+.el-theme-dark #app {
+  background-color: #121212;
+  color: #eee;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

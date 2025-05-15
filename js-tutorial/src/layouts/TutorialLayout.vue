@@ -13,7 +13,8 @@
 </template>
 
 <script setup>
-import Header from '@/components/Header.vue' // 确保路径正确
+import Header from '@/components/Header.vue' 
+import '@/styles/index.css'
 </script>
 
 <style scoped>
