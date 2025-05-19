@@ -2,10 +2,14 @@
   font-family: "宋体", "SimSun", "Times New Roman", Times, serif;
 }
 
-/* index.css */
-.el-theme-dark body, 
-.el-theme-dark #app {
-  background-color: #121212;
-  color: #eee;
-  transition: background-color 0.3s ease, color 0.3s ease;
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --hover-bg: #ecf5ff;
+}
+
+.dark {
+  --bg-color: #1e1e1e;
+  --text-color: #f2f2f2;
+  --hover-bg: #2a2a2a;
 }

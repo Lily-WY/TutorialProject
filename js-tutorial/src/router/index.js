@@ -3,13 +3,16 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    redirect: '/tutorial/Introduction'
+    redirect: '/tutorial/entry/what-is-js' 
   },
   {
-    path: '/tutorial/:section',
+    path: '/tutorial/:section/:subsection?',
     name: 'TutorialSection',
     component: () => import('@/layouts/TutorialLayout.vue'),
-    props: true  // 👈 自动将 route.params.section 作为 prop 传入组件
+    props: route => ({
+      section: route.params.section,
+      subsection: route.params.subsection || null
+    })
   }
 ]
 

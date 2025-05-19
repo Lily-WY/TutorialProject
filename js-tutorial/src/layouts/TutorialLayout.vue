@@ -1,26 +1,37 @@
 <template>
-    <div class="common-layout">
-        <el-container class="header">
-            <!-- 导入的 Header 组件 -->
-            <Header />
+  <div class="common-layout">
+    <el-container style="height: 100vh;">
+      <el-header>
+        <Header />
+      </el-header>
 
-            <!-- <el-container>
-        <el-aside width="200px">Aside</el-aside>
-        <el-main>Main</el-main>
-      </el-container> -->
-        </el-container>
-    </div>
+      <el-container>
+        <el-aside width="220px">
+          <Sidebar :section="section" :subsection="subsection" />
+        </el-aside>
+
+        <el-main>
+          <router-view />
+        </el-main>
+      </el-container>
+    </el-container>
+  </div>
 </template>
 
 <script setup>
-import Header from '@/components/Header.vue' 
+import Header from '@/components/Header.vue'
+import Sidebar from '@/components/Sidebar.vue'
+
+defineProps({
+  section: String,
+  subsection: String
+})
+
 import '@/styles/index.css'
 </script>
 
 <style scoped>
-  .common-layout {
-      height: 100vh;
-    }
-  
-
+.common-layout {
+  height: 100vh;
+}
 </style>

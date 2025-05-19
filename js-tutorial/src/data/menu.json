@@ -1,0 +1,69 @@
+[
+  {
+    "id": "entry",
+    "title": "入门介绍",
+    "children": [
+      { "title": "什么是 JavaScript", "path": "what-is-js" },
+      { "title": "JS 的运行环境", "path": "runtime" },
+      { "title": "引入 JS 到网页", "path": "include-js" }
+    ]
+  },
+   {
+    "id": "syntax",
+    "title": "语法基础",
+    "children": [
+      { "title": "变量和常量", "path": "variables" },
+      { "title": "数据类型", "path": "datatypes" },
+      { "title": "运算符", "path": "operators" },
+      { "title": "条件语句", "path": "conditions" },
+      { "title": "循环语句", "path": "loops" }
+    ]
+  },
+  {
+    "id": "function",
+    "title": "函数与作用域",
+    "children": [
+      { "title": "函数定义与调用", "path": "basic" },
+      { "title": "箭头函数", "path": "arrow" },
+      { "title": "回调函数", "path": "callback" },
+      { "title": "作用域与闭包", "path": "closure" }
+    ]
+  },
+  {
+    "id": "object",
+    "title": "对象与数组",
+    "children": [
+      { "title": "对象基础", "path": "object-basic" },
+      { "title": "数组方法", "path": "array-methods" },
+      { "title": "对象数组操作", "path": "object-array" }
+    ]
+  },
+  {
+    "id": "dom",
+    "title": "DOM 操作与事件",
+    "children": [
+      { "title": "获取元素", "path": "selectors" },
+      { "title": "修改内容和样式", "path": "manipulation" },
+      { "title": "事件监听", "path": "events" }
+    ]
+  },
+  {
+    "id": "advanced",
+    "title": "进阶知识",
+    "children": [
+      { "title": "异步编程与 Promise", "path": "promise" },
+      { "title": "async/await", "path": "async-await" },
+      { "title": "模块化导入导出", "path": "modules" },
+      { "title": "ES6+ 新特性", "path": "es6-features" }
+    ]
+  },
+  {
+    "id": "projects",
+    "title": "项目实战",
+    "children": [
+      { "title": "待办事项 Todo List", "path": "todolist" },
+      { "title": "计算器", "path": "calculator" },
+      { "title": "秒表/计时器", "path": "timer" }
+    ]
+  }
+]
