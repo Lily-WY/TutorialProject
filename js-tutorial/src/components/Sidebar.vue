@@ -1,6 +1,6 @@
 <template>
   <el-menu :default-active="activePath" class="el-menu-vertical-demo"
-    text-color="#333" active-text-color="#409EFF" router unique-opened>
+    active-text-color="#409EFF" router unique-opened>
     <template v-for="section in menu" :key="section.id">
       <!-- 每个一级目录 -->
       <el-sub-menu :index="`/tutorial/${section.id}`">
@@ -26,10 +26,9 @@ import menu from '@/data/menu.json'
 import '@/styles/index.css'
 
 const route = useRoute()
-
-// 默认激活的菜单路径，就是当前路由的完整路径
 const activePath = computed(() => route.fullPath)
 </script>
+
 
 <style scoped>
 .el-menu {

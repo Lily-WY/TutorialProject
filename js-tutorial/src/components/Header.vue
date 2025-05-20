@@ -62,7 +62,7 @@ const toggleTheme = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 100px;
+  height: 95px;
   width: 100%;
   padding: 0 40px;
   position: sticky;
@@ -71,6 +71,7 @@ const toggleTheme = () => {
   transition: background-color 0.3s ease, color 0.3s ease;
   background-color: var(--bg-color);
   color: var(--text-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .left {
@@ -100,7 +101,7 @@ const toggleTheme = () => {
 .search-box {
   width: 700px;
   font-size: 15px;
-  margin-top: 10px;
+  margin-top: 6px;
   margin-right: 20px;
 }
 
