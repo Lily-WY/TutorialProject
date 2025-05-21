@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    redirect: '/tutorial/entry/what-is-js' 
+    redirect: '/tutorial/entry/what-is-js'
   },
   {
     path: '/tutorial/:section/:subsection?',
@@ -13,7 +13,12 @@ const routes = [
       section: route.params.section,
       subsection: route.params.subsection || null
     })
+  },
+  {
+    path: '/upload',
+    component: () => import('@/views/UploadPage.vue')
   }
+
 ]
 
 const router = createRouter({

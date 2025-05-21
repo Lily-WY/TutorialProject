@@ -9,8 +9,8 @@
         <Sidebar :section="section" :subsection="subsection" />
       </el-aside>
 
-      <el-main>
-        <router-view />
+      <el-main class="main-content">
+        <TutorialContent :path="subsection || 'what-is-js'" />
       </el-main>
     </el-container>
   </div>
@@ -19,6 +19,7 @@
 <script setup>
 import Header from '@/components/Header.vue'
 import Sidebar from '@/components/Sidebar.vue'
+import TutorialContent from '@/components/TutorialContent.vue'
 
 defineProps({
   section: String,
@@ -42,5 +43,9 @@ import '@/styles/index.css'
   margin-top: 75px; /* 推开 header 高度，避免遮挡 */
   height: calc(100vh - 100px);
   overflow: auto;
+}
+
+.main-content {
+  margin-top: 45px;
 }
 </style>
