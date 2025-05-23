@@ -1,5 +1,5 @@
 * {
-  font-family: "宋体", "SimSun", "Times New Roman", Times, serif;
+  font-family: "Times New Roman", Times, serif, "宋体" !important;
 }
 
 :root {

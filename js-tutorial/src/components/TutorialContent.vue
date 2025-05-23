@@ -1,7 +1,31 @@
+<template>
+  <div class="markdown-content">
+    <!-- 内容渲染 -->
+    <div v-html="content" />
+
+    <!-- 下一节按钮 -->
+    <div class="next-section" v-if="nextSection">
+      <router-link :to="`/tutorial/${nextSection.path}`" class="no-underline">
+        <el-button>
+          Next
+          <el-icon><Right /></el-icon>
+        </el-button>
+        <div class="next-title">{{ nextSection.title }}</div>
+      </router-link>
+    </div>
+  </div>
+</template>
+
+
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import axios from 'axios'
-import { marked } from 'marked' // 引入 marked 库
+import { marked } from 'marked' 
+import '@/styles/index.css'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import menu from '@/data/menu.json'
+import { Right } from '@element-plus/icons-vue'
 
 const props = defineProps({
   path: {
@@ -30,42 +54,63 @@ async function fetchContent() {
 
 onMounted(fetchContent)
 watch(() => props.path, fetchContent)
-</script>
 
-<template>
-  <div class="markdown-content" v-html="content"></div>
-</template>
+const route = useRoute()
+
+// 扁平化 menu 中的所有章节 [{ path, title }]
+const flatChapters = menu.flatMap(section => section.children.map(child => ({
+  path: child.path,
+  title: child.title
+})))
+
+const currentIndex = computed(() => flatChapters.findIndex(item => item.path === route.params.subsection || route.params.section))
+
+const nextSection = computed(() => {
+  if (currentIndex.value >= 0 && currentIndex.value < flatChapters.length - 1) {
+    return flatChapters[currentIndex.value + 1]
+  } else {
+    return null
+  }
+})
+</script>
 
 <style scoped>
 .markdown-content {
-  line-height: 1.6;
+  line-height: 1.7;
   margin-left: 20px;
   padding-left: 1.2em;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  letter-spacing: 1px;
+  color: var(--text-color);
 }
 
-.markdown-content >>> h1 {
+.markdown-content :deep(h1) {
   font-size: 2em;
   margin-bottom: 16px;
   margin-top: 0;
+  padding-top: 8px;
   border-bottom: 1px solid #eee;
   padding-bottom: 0.3em;
+  font-weight: 550;
 }
 
-.markdown-content >>> h2 {
+.markdown-content :deep(h2) {
   font-size: 1.5em;
   border-bottom: 1px solid #eee;
   padding-bottom: 0.3em;
   margin-top: 1em;
   margin-bottom: 16px;
+  font-weight: 550;
+
 }
 
-.markdown-content p {
-  font-size: 2em; /* 16px */
+.markdown-content :deep(p) {
+  font-size: 1.2em;
+  line-height: 1.6;
   margin-bottom: 1.2em;
 }
 
-.markdown-content >>> code {
+.markdown-content :deep(code) {
   background-color: #f6f8fa;
   padding: 0.2em 0.4em;
   border-radius: 3px;
@@ -73,58 +118,52 @@ watch(() => props.path, fetchContent)
   font-size: 1.2em;
 }
 
-.markdown-content >>> pre {
+.markdown-content :deep(pre) {
   background-color: #f6f8fa;
   padding: 16px;
   border-radius: 3px;
   overflow: auto;
 }
 
-.markdown-content >>> blockquote {
+.markdown-content :deep(blockquote) {
   border-left: 4px solid #dfe2e5;
   color: #6a737d;
   padding: 0 1em;
   margin-left: 0;
 }
 
-.markdown-content a {
-  color: #0366d6;
+.markdown-content :deep(li) {
+  font-size: 1.1em;
+}
+
+.markdown-content :deep(strong) {
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.next-section {
+  margin-top: 60px;
+  text-align: right;
+  margin-right: 20px;
+}
+
+.el-button {
+  font-size: 1.2em;
+}
+
+.next-title {
+  margin-top: 8px;
+  font-size: 1em;
+  color: var(--text-color);
+  padding-bottom: 15px;
+}
+
+.el-icon {
+  margin-left: 7%;
+  margin-top: 1px;
+}
+
+.no-underline {
   text-decoration: none;
-}
-
-.markdown-content a:hover {
-  text-decoration: underline;
-}
-
-.markdown-content img {
-  max-width: 100%;
-  height: auto;
-  margin: 1em 0;
-}
-
-.markdown-content table {
-  border-collapse: collapse;
-  width: 100%;
-  margin-bottom: 1.2em;
-}
-
-.markdown-content th, 
-.markdown-content td {
-  border: 1px solid #ddd;
-  padding: 8px 12px;
-}
-
-.markdown-content th {
-  background-color: #f5f5f5;
-}
-
-.markdown-content ul, 
-.markdown-content ol {
-  margin-bottom: 1.2em;
-  padding-left: 2em;
-}
-
-.markdown-content li {
-  margin-bottom: 0.5em;
 }
 </style>

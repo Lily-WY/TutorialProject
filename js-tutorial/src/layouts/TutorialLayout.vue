@@ -35,12 +35,12 @@ import '@/styles/index.css'
   top: 0;
   left: 0;
   right: 0;
-  height: 95px; /* 和 Header 组件高度保持一致 */
+  height: 95px; 
   z-index: 1000;
 }
 
 .body-container {
-  margin-top: 75px; /* 推开 header 高度，避免遮挡 */
+  margin-top: 75px; 
   height: calc(100vh - 100px);
   overflow: auto;
 }
