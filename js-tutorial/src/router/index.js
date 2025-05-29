@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Playground from '@/components/Playground.vue'
 
 const routes = [
   {
@@ -17,6 +18,11 @@ const routes = [
   {
     path: '/upload',
     component: () => import('@/views/UploadPage.vue')
+  },
+  {
+    path: '/playground',
+    name: 'Playground',
+    component: Playground
   }
 
 ]

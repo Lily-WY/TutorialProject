@@ -12,11 +12,11 @@
         class="search-box"
       />
       <div class="nav">
-        <el-menu mode="horizontal" :ellipsis="false" class="menu" :default-active="active">
-          <el-menu-item index="1">基础</el-menu-item>
-          <el-menu-item index="2">进阶</el-menu-item>
-          <el-menu-item index="3">练习</el-menu-item>
-          <el-menu-item index="4">讨论区</el-menu-item>
+        <el-menu mode="horizontal" :ellipsis="false" class="menu" :default-active="active" router>
+          <el-menu-item index="/tutorial/entry/what-is-js">基础</el-menu-item>
+          <el-menu-item index="/tutorial/advanced/promise">进阶</el-menu-item>
+          <el-menu-item index="/tutorial/projects/todolist">练习</el-menu-item>
+          <el-menu-item index="/playground">在线编辑器</el-menu-item>
         </el-menu>
       </div>
       <div class="theme-toggle" @click="toggleTheme">
@@ -30,7 +30,9 @@
 <script setup>
 import { Search, Sunny, Moon } from '@element-plus/icons-vue'
 import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const inputValue = ref('')
 const active = ref('1')
 const isDark = ref(false) // 默认是浅色
