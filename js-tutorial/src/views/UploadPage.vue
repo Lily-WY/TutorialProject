@@ -32,16 +32,46 @@ const errorMessage = ref('')
 
 async function upload() {
   try {
-    const res = await axios.post('http://localhost:3000/api/tutorial', {
-      path: path.value,
-      content: content.value
-    })
-    successMessage.value = '上传成功，ID：' + res.data.id
+    // 首先检查内容是否存在
+    const checkRes = await axios.get(`http://localhost:3000/api/tutorial/${path.value}`)
+
+    if (checkRes.data) {
+      // 内容已存在，执行更新
+      const updateRes = await axios.put(`http://localhost:3000/api/tutorial/${path.value}`, {
+        content: content.value
+      })
+      successMessage.value = '内容已更新'
+    } else {
+      // 内容不存在，执行创建
+      const createRes = await axios.post('http://localhost:3000/api/tutorial', {
+        path: path.value,
+        content: content.value
+      })
+      successMessage.value = '新内容已创建'
+    }
+
     errorMessage.value = ''
     path.value = ''
     content.value = ''
   } catch (err) {
-    errorMessage.value = '上传失败：' + (err.response?.data?.message || err.message)
+    if (err.response?.status === 404) {
+      // 内容不存在，执行创建
+      try {
+        const createRes = await axios.post('http://localhost:3000/api/tutorial', {
+          path: path.value,
+          content: content.value
+        })
+        successMessage.value = '新内容已创建'
+        errorMessage.value = ''
+        path.value = ''
+        content.value = ''
+        return
+      } catch (createErr) {
+        errorMessage.value = '创建失败：' + (createErr.response?.data?.message || createErr.message)
+      }
+    } else {
+      errorMessage.value = '操作失败：' + (err.response?.data?.message || err.message)
+    }
     successMessage.value = ''
   }
 }

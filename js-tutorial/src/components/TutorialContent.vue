@@ -27,6 +27,12 @@ import { useRoute } from 'vue-router'
 import menu from '@/data/menu.json'
 import { Right } from '@element-plus/icons-vue'
 
+// Configure marked without CodeBlock handling
+marked.setOptions({
+  breaks: true,
+  gfm: true
+})
+
 const props = defineProps({
   path: {
     type: String,
@@ -57,20 +63,43 @@ watch(() => props.path, fetchContent)
 
 const route = useRoute()
 
-// 扁平化 menu 中的所有章节 [{ path, title }]
-const flatChapters = menu.flatMap(section => section.children.map(child => ({
-  path: child.path,
-  title: child.title
-})))
+// 扁平化 menu 中的所有章节并包含完整路径信息
+const flatChapters = menu.flatMap((section, sectionIndex) => 
+  section.children.map((child, childIndex) => ({
+    path: `${section.id}/${child.path}`,
+    title: child.title,
+    sectionIndex,
+    childIndex
+  }))
+)
 
-const currentIndex = computed(() => flatChapters.findIndex(item => item.path === route.params.subsection || route.params.section))
+// 获取当前路径
+const currentPath = computed(() => {
+  const { section, subsection } = route.params
+  return subsection ? `${section}/${subsection}` : section
+})
 
+// 获取当前索引
+const currentIndex = computed(() => 
+  flatChapters.findIndex(item => item.path === currentPath.value)
+)
+
+// 获取下一节信息
 const nextSection = computed(() => {
-  if (currentIndex.value >= 0 && currentIndex.value < flatChapters.length - 1) {
-    return flatChapters[currentIndex.value + 1]
-  } else {
-    return null
+  const current = currentIndex.value
+  if (current >= 0 && current < flatChapters.length - 1) {
+    return flatChapters[current + 1]
   }
+  return null
+})
+
+// 用于调试的 watcher
+watch([currentPath, currentIndex, nextSection], ([path, index, next]) => {
+  console.log('Debug info:', {
+    currentPath: path,
+    currentIndex: index,
+    nextSection: next
+  })
 })
 </script>
 
@@ -142,7 +171,9 @@ const nextSection = computed(() => {
 }
 
 .next-section {
-  margin-top: 60px;
+  margin-top: 2rem;
+  padding: 1rem;
+  border-top: 1px solid #eee;
   text-align: right;
   margin-right: 20px;
 }
@@ -152,7 +183,7 @@ const nextSection = computed(() => {
 }
 
 .next-title {
-  margin-top: 8px;
+  margin-top: 0.5rem;
   font-size: 1em;
   color: var(--text-color);
   padding-bottom: 15px;
