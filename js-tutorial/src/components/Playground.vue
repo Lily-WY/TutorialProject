@@ -1,3 +1,4 @@
+//无法编辑、清空
 <template>
   <div class="playground">
     <div class="editor-container">
@@ -5,15 +6,31 @@
         <div class="toolbar">
           <span>JavaScript</span>
           <div class="actions">
-            <el-button size="small" @click="runCode" :loading="isLoading">
+            <el-button size="small" @click="handleRun" :loading="isLoading">
               <el-icon><VideoPlay /></el-icon> 运行
             </el-button>
-            <el-button size="small" @click="clearCode">
-              <el-icon><Delete /></el-icon> 清空
-            </el-button>
+            <el-dropdown>
+              <el-button size="small">
+                <el-icon><Delete /></el-icon> 清空
+                <el-icon class="el-icon--right"><arrow-down /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="handleReset">重置为默认代码</el-dropdown-item>
+                  <el-dropdown-item @click="handleClear">完全清空</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </div>
         </div>
-        <div ref="editorContainer" class="editor"></div>
+        <MonacoEditor
+          ref="monacoEditor"
+          v-model:value="code"
+          class="editor"
+          :options="editorOptions"
+          @mounted="handleEditorMounted"
+          @change="handleChange"
+        />
       </div>
       <div class="output-section">
         <div class="output-header">输出结果</div>
@@ -30,47 +47,42 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import * as monaco from 'monaco-editor'
-import { useWindowSize } from '@vueuse/core'
-import { VideoPlay, Delete } from '@element-plus/icons-vue'
+import MonacoEditor from '@guolao/vue-monaco-editor' // Changed import
+import { VideoPlay, Delete, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
-const { width, height } = useWindowSize()
-const editorContainer = ref(null)
-const editorInstance = ref(null)
+const monacoEditor = ref(null)
 const isLoading = ref(false)
 const isError = ref(false)
 const outputLines = ref([])
-const code = ref('// 在这里输入你的JavaScript代码\nconsole.log("Hello World!");')
+const defaultCode = '// 在这里输入你的JavaScript代码\nconsole.log("Hello World!");'
+const code = ref(defaultCode)
 
-onMounted(() => {
-  if (editorContainer.value) {
-    editorInstance.value = monaco.editor.create(editorContainer.value, {
-      value: code.value,
-      language: 'javascript',
-      theme: 'vs-dark',
-      fontSize: 14,
-      minimap: { enabled: false },
-      scrollBeyondLastLine: false,
-      automaticLayout: true,
-      lineNumbers: 'on',
-      padding: { top: 10 }
-    })
+const editorOptions = {
+  language: 'javascript',
+  theme: 'vs-dark',
+  fontSize: 17,
+  minimap: { enabled: false },
+  scrollBeyondLastLine: false,
+  automaticLayout: true,
+  lineNumbers: 'on',
+  tabSize: 2,
+  wordWrap: 'on',
+  formatOnPaste: true,
+  formatOnType: true,
+  readOnly: false
+}
 
-    editorInstance.value.onDidChangeModelContent(() => {
-      code.value = editorInstance.value.getValue()
-    })
-  }
-})
+const handleEditorMounted = (editor) => {
+  monacoEditor.value = editor
+}
 
-onBeforeUnmount(() => {
-  if (editorInstance.value) {
-    editorInstance.value.dispose()
-  }
-})
+const handleChange = (value) => {
+  code.value = value
+}
 
-const runCode = async () => {
-  if (!editorInstance.value) {
+const handleRun = async () => {
+  if (!monacoEditor.value) {
     ElMessage.error('编辑器未就绪')
     return
   }
@@ -80,11 +92,11 @@ const runCode = async () => {
     isError.value = false
     outputLines.value = []
 
-    const console = {
+    const customConsole = {
       log: (...args) => {
         outputLines.value.push(
           args.map(arg => 
-            typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
           ).join(' ')
         )
       },
@@ -94,40 +106,55 @@ const runCode = async () => {
       }
     }
 
-    await new Promise((resolve) => {
-      const timeoutId = setTimeout(() => {
-        isError.value = true
-        outputLines.value.push('Error: 代码执行超时')
-        resolve()
-      }, 3000)
-
-      try {
-        new Function('console', code.value)(console)
-        clearTimeout(timeoutId)
-        resolve()
-      } catch (err) {
-        clearTimeout(timeoutId)
-        console.error(err.message)
-        resolve()
-      }
-    })
+    new Function('console', code.value)(customConsole)
   } catch (err) {
     isError.value = true
-    outputLines.value = ['Error: ' + err.message]
+    outputLines.value.push('Error: ' + err.message)
     ElMessage.error('代码执行出错')
   } finally {
     isLoading.value = false
   }
 }
 
-const clearCode = () => {
-  if (editorInstance.value) {
-    editorInstance.value.setValue('// 在这里输入你的JavaScript代码\n')
+const handleReset = () => {
+  if (!monacoEditor.value) {
+    ElMessage.error('编辑器未就绪')
+    return
+  }
+
+  try {
+    code.value = defaultCode
+    outputLines.value = []
+    isError.value = false
+    ElMessage.success('已重置代码和输出')
+  } catch (err) {
+    ElMessage.error('重置失败：' + err.message)
+  }
+}
+
+const handleClear = () => {
+  if (!monacoEditor.value) {
+    ElMessage.error('编辑器未就绪')
+    return
+  }
+
+  try {
+    code.value = ''
     outputLines.value = []
     isError.value = false
     ElMessage.success('已清空代码和输出')
+  } catch (err) {
+    ElMessage.error('清空失败：' + err.message)
   }
 }
+
+onMounted(() => {
+  // Additional initialization if needed
+})
+
+onBeforeUnmount(() => {
+  // Cleanup if needed
+})
 </script>
 
 <style scoped>
@@ -169,6 +196,14 @@ const clearCode = () => {
 .editor {
   flex: 1;
   height: calc(100vh - 200px);
+  min-height: 400px;
+  width: 100%;
+}
+
+:deep(.monaco-editor) {
+  padding: 0;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .output-section {
