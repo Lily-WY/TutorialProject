@@ -4,6 +4,8 @@ import App from './App.vue'
 import MonacoEditor from '@guolao/vue-monaco-editor'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
+import 'element-plus/theme-chalk/dark/css-vars.css'
+import '@/styles/index.css'  
 import router from './router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
@@ -23,5 +25,4 @@ app.use(MonacoEditor, {
 
 app.use(router)
 app.use(ElementPlus)
-
 app.mount('#app')
