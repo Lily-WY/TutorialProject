@@ -149,7 +149,13 @@ const handleClear = () => {
 }
 
 onMounted(() => {
-  // Additional initialization if needed
+  const savedCode = localStorage.getItem('playground-code')
+  if (savedCode) {
+    // 设置到编辑器中
+    code.value = savedCode
+    // 可选：清除 localStorage 中的代码
+    localStorage.removeItem('playground-code')
+  }
 })
 
 onBeforeUnmount(() => {
