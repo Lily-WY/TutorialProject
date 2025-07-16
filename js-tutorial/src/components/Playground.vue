@@ -199,6 +199,14 @@ onBeforeUnmount(() => {
   gap: 8px;
 }
 
+.actions :deep(.el-button) {
+  font-size: 12px; 
+}
+
+:deep(.el-dropdown-menu__item) {
+  font-size: 12px;
+}
+
 .editor {
   flex: 1;
   height: calc(100vh - 200px);

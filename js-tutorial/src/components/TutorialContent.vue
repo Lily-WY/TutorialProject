@@ -3,15 +3,32 @@
     <!-- 内容渲染 -->
     <div v-html="content" ref="contentContainer" />
 
-    <!-- 下一节按钮 -->
-    <div class="next-section" v-if="nextSection">
-      <router-link :to="`/tutorial/${nextSection.path}`" class="no-underline">
-        <el-button>
-          Next
-          <el-icon><Right /></el-icon>
-        </el-button>
-        <div class="next-title">{{ nextSection.title }}</div>
-      </router-link>
+    <!-- 导航按钮区域 -->
+    <div class="navigation-section">
+      <!-- 上一节按钮 -->
+      <div class="prev-section" v-if="prevSection">
+        <router-link :to="`/tutorial/${prevSection.path}`" class="no-underline">
+          <el-button>
+            <el-icon><ArrowLeft /></el-icon>
+            Previous
+          </el-button>
+          <div class="prev-title">{{ prevSection.title }}</div>
+        </router-link>
+      </div>
+
+      <!-- 占位符，当没有上一节时保持布局 -->
+      <div v-else></div>
+
+      <!-- 下一节按钮 -->
+      <div class="next-section" v-if="nextSection">
+        <router-link :to="`/tutorial/${nextSection.path}`" class="no-underline">
+          <el-button>
+            Next
+            <el-icon><Right /></el-icon>
+          </el-button>
+          <div class="next-title">{{ nextSection.title }}</div>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -26,7 +43,7 @@ import '@/styles/content.css'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import menu from '@/data/menu.json'
-import { Right, CopyDocument, VideoPlay } from '@element-plus/icons-vue'
+import { Right, ArrowLeft, CopyDocument, VideoPlay } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 // Configure marked without CodeBlock handling
@@ -284,6 +301,15 @@ const currentPath = computed(() => {
 const currentIndex = computed(() => 
   flatChapters.findIndex(item => item.path === currentPath.value)
 )
+
+// 获取上一节信息
+const prevSection = computed(() => {
+  const current = currentIndex.value
+  if (current > 0) {
+    return flatChapters[current - 1]
+  }
+  return null
+})
 
 // 获取下一节信息
 const nextSection = computed(() => {

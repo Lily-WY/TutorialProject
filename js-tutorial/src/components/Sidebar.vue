@@ -37,6 +37,32 @@ const activePath = computed(() => route.fullPath)
   margin-left: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   color: var(--text-color);
+  /* 设置固定高度和滚动 */
+  height: calc(100vh - 85px);
+  overflow-y: auto;
+}
+
+/* 自定义滚动条样式 */
+.el-menu::-webkit-scrollbar {
+  width: 6px; /* 滚动条宽度 */
+}
+
+.el-menu::-webkit-scrollbar-track {
+  background: #f1f1f1; /* 滚动条轨道颜色 */
+  border-radius: 3px;
+}
+
+.el-menu::-webkit-scrollbar-thumb {
+  background: #e3e3e3; /* 滚动条滑块颜色（浅灰色） */
+  border-radius: 3px;
+}
+
+
+
+/* Firefox 滚动条样式 */
+.el-menu {
+  scrollbar-width: thin;
+  scrollbar-color: #d0d0d0 #f1f1f1; /* 滑块颜色 轨道颜色 */
 }
 
 /* 一级菜单标题字体 */
