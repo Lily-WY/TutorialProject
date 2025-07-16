@@ -114,15 +114,25 @@
   background: #ffffff;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px; /* 添加底部边距，避免重叠 */
 }
 
 .markdown-content .output-title {
   background: #f8fafc;
-  padding: 12px 16px;
-  font-size: 1em;
+  padding: 8px 16px; /* 减少内边距 */
+  font-size: 0.9em; /* 稍微减小字体 */
   font-weight: 600;
   color: #374151;
   border-bottom: 1px solid #e5e7eb;
+  margin: 0; /* 移除边距 */
+}
+
+/* 确保iframe不会有额外的边距或边框 */
+.markdown-content .code-output iframe {
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
 }
 
 .markdown-content .output-content {

@@ -74,9 +74,16 @@ async function fetchContent() {
     // 将 Markdown 转换为 HTML
     content.value = marked.parse(res.data.content)
     
-    // 等待 DOM 更新后添加复制按钮
+    // 等待 DOM 更新后添加复制按钮并滚动到内容顶部
     await nextTick()
     addCodeButtons()
+    
+    // 滚动到内容区域的顶部
+    if (contentContainer.value) {
+      contentContainer.value.scrollIntoView({ 
+        block: 'start'
+      })
+    }
   } catch {
     content.value = '<p>加载内容失败</p>'
   }
@@ -160,7 +167,7 @@ async function copyCode(pre) {
   }
 }
 
-// 运行JavaScript代码
+// 运行JavaScript代码或HTML代码
 function runCode(pre) {
   const code = pre.querySelector('code')
   const codeText = code ? code.textContent : pre.textContent
@@ -176,6 +183,93 @@ function runCode(pre) {
   // 清空之前的输出
   outputDiv.innerHTML = ''
   
+  // 判断是否为HTML代码
+  const isHTML = codeText.trim().toLowerCase().includes('<!doctype html') || 
+                 codeText.trim().toLowerCase().includes('<html') ||
+                 codeText.trim().toLowerCase().includes('<body') ||
+                 codeText.trim().toLowerCase().includes('<head')
+  
+  if (isHTML) {
+    // 处理HTML代码
+    runHTMLCode(codeText, outputDiv)
+  } else {
+    // 处理纯JavaScript代码
+    runJavaScriptCode(codeText, outputDiv)
+  }
+  
+  // 移除这行代码，不再显示顶部提示
+  // ElMessage.success('代码运行完成')
+  
+  // 可选：在按钮附近显示临时提示
+  showButtonTip(pre, '运行完成!')
+}
+
+// 在按钮附近显示临时提示
+function showButtonTip(pre, message) {
+  const buttonContainer = pre.querySelector('.code-buttons')
+  if (!buttonContainer) return
+  
+  // 创建提示元素
+  const tip = document.createElement('div')
+  tip.textContent = message
+  tip.style.cssText = `
+    position: absolute;
+    left: -100px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(64, 158, 255, 0.7);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800px;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.25);
+    border: none;
+    font-family: inherit;
+    backdrop-filter: blur(10px);
+  `
+  
+  buttonContainer.appendChild(tip)
+  
+  // 2秒后移除提示
+  setTimeout(() => {
+    if (tip.parentNode) {
+      tip.parentNode.removeChild(tip)
+    }
+  }, 2000)
+}
+
+// 运行HTML代码
+function runHTMLCode(htmlCode, outputDiv) {
+  // 创建输出标题
+  const outputTitle = document.createElement('div')
+  outputTitle.className = 'output-title'
+  outputTitle.textContent = '网页预览:'
+  outputDiv.appendChild(outputTitle)
+  
+  // 创建iframe来运行HTML代码
+  const iframe = document.createElement('iframe')
+  iframe.style.width = '100%'
+  iframe.style.height = '200px' // 减小高度
+  iframe.style.border = '1px solid #ddd'
+  iframe.style.borderRadius = '4px'
+  iframe.style.background = 'white'
+  iframe.style.display = 'block' // 确保显示为块级元素
+  iframe.style.marginBottom = '0' // 移除底部边距
+  
+  outputDiv.appendChild(iframe)
+  
+  // 将HTML代码写入iframe
+  const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
+  iframeDoc.open()
+  iframeDoc.write(htmlCode)
+  iframeDoc.close()
+}
+
+// 运行纯JavaScript代码
+function runJavaScriptCode(codeText, outputDiv) {
   // 创建输出标题
   const outputTitle = document.createElement('div')
   outputTitle.className = 'output-title'
@@ -209,10 +303,13 @@ function runCode(pre) {
     originalWarn.apply(console, args)
   }
   
-  // 重写alert方法
+  // 重写alert方法 - 既显示真实弹窗，也记录到输出
   const originalAlert = window.alert
   window.alert = (message) => {
-    logs.push({ type: 'alert', content: String(message) })
+    const messageStr = String(message)
+    logs.push({ type: 'alert', content: messageStr })
+    // 调用原始的alert方法显示真实弹窗
+    originalAlert(messageStr)
   }
   
   try {
@@ -256,8 +353,6 @@ function runCode(pre) {
     
     outputContent.appendChild(logElement)
   })
-  
-  ElMessage.success('代码运行完成')
 }
 
 // 格式化输出内容
