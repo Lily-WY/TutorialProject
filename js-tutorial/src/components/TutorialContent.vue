@@ -107,35 +107,34 @@ function addCodeButtons() {
     const copyButton = document.createElement('button')
     copyButton.className = 'code-button copy-button'
     copyButton.innerHTML = `
-      <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16">
-        <path d="M832 64H296c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h496v688c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8V96c0-17.7-14.3-32-32-32zM704 192H192c-17.7 0-32 14.3-32 32v530.7c0 8.5 3.4 16.6 9.4 22.6l173.3 173.3c2.2 2.2 4.7 4 7.4 5.5v1.9h4.4c2 0.5 4.1 0.8 6.1 0.8H704c17.7 0 32-14.3 32-32V224c0-17.7-14.3-32-32-32zM350 856.2L263.9 770H350v86.2zM672 924H414V746c0-22.1-17.9-40-40-40H192V256h480v668z"></path>
+      <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16" fill="currentColor">
+        <path d="M832 64H296c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h496v688c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8V96c0-17.7-14.3-32-32-32zM704 192H192c-17.7 0-32 14.3-32 32v530.7c0 8.5 3.4 16.6 9.4 22.6l173.3 173.3c2.2 2.2 4.7 4 7.4 5.5v1.9h4.4c2.9.8 6 1.3 9.3 1.3H704c17.7 0 32-14.3 32-32V224c0-17.7-14.3-32-32-32zM350 856.2L263.9 770H350v86.2zM672 888H414V746c0-22.1-17.9-40-40-40H232V264h440v624z"></path>
       </svg>
+      <span>Copy</span>
     `
-    copyButton.title = '复制代码'
     copyButton.onclick = () => copyCode(pre)
-    
-    // 创建 Playground 按钮
-    const playgroundButton = document.createElement('button')
-    playgroundButton.className = 'code-button playground-button'
-    playgroundButton.innerHTML = `
-      <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16">
-        <path d="M880 112H144c-17.7 0-32 14.3-32 32v736c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V144c0-17.7-14.3-32-32-32zM528 176c0-4.4 3.6-8 8-8h168c4.4 0 8 3.6 8 8v48c0 4.4-3.6 8-8 8H536c-4.4 0-8-3.6-8-8v-48zm-192 0c0-4.4 3.6-8 8-8h112c4.4 0 8 3.6 8 8v48c0 4.4-3.6 8-8 8H344c-4.4 0-8-3.6-8-8v-48zM816 848H208V272h608v576z"></path>
-        <path d="M536 368c0-4.4 3.6-8 8-8h200c4.4 0 8 3.6 8 8v56c0 4.4-3.6 8-8 8H544c-4.4 0-8-3.6-8-8v-56zm0 152c0-4.4 3.6-8 8-8h200c4.4 0 8 3.6 8 8v56c0 4.4-3.6 8-8 8H544c-4.4 0-8-3.6-8-8v-56zM280 368c0-4.4 3.6-8 8-8h176c4.4 0 8 3.6 8 8v56c0 4.4-3.6 8-8 8H288c-4.4 0-8-3.6-8-8v-56zm0 152c0-4.4 3.6-8 8-8h176c4.4 0 8 3.6 8 8v56c0 4.4-3.6 8-8 8H288c-4.4 0-8-3.6-8-8v-56z"></path>
-      </svg>
-    `
-    playgroundButton.title = '在 Playground 中编辑'
-    playgroundButton.onclick = () => openInPlayground(pre)
     
     // 创建运行按钮
     const runButton = document.createElement('button')
     runButton.className = 'code-button run-button'
     runButton.innerHTML = `
-      <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16">
+      <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16" fill="currentColor">
         <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm144.1 454.9L437.7 677.8a8 8 0 01-12.6-6.5V353.7a8 8 0 0112.6-6.5L656.1 506a8 8 0 010 12.9z"></path>
       </svg>
+      <span>Run</span>
     `
-    runButton.title = '运行代码'
     runButton.onclick = () => runCode(pre)
+    
+    // 创建 Playground 按钮
+    const playgroundButton = document.createElement('button')
+    playgroundButton.className = 'code-button playground-button'
+    playgroundButton.innerHTML = `
+      <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16" fill="currentColor">
+        <path d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9c3.9-3.9 3.9-10.2 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2c-1.9 10.8 1.5 21.4 8.8 28.7 6.1 6.1 14.3 9.5 22.9 9.5zm67.4-174.4L687.8 215l73.3 73.3-362.7 362.6-88.9 15.7 15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z"></path>
+      </svg>
+      <span>Edit in Playground</span>
+    `
+    playgroundButton.onclick = () => openInPlayground(pre)
     
     buttonContainer.appendChild(copyButton)
     buttonContainer.appendChild(runButton)
