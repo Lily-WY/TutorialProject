@@ -52,7 +52,7 @@ import '@/styles/index.css'
 }
 
 .body-container {
-  margin-top: 95px;
+  margin-top: 55px;
   flex: 1;
   min-height: calc(100vh - 95px);
 }

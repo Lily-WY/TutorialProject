@@ -78,12 +78,8 @@ async function fetchContent() {
     await nextTick()
     addCodeButtons()
     
-    // 滚动到内容区域的顶部
-    if (contentContainer.value) {
-      contentContainer.value.scrollIntoView({ 
-        block: 'start'
-      })
-    }
+    // 直接跳转到页面顶部
+    window.scrollTo(0, 0)
   } catch {
     content.value = '<p>加载内容失败</p>'
   }
@@ -151,9 +147,25 @@ async function copyCode(pre) {
   const code = pre.querySelector('code')
   const text = code ? code.textContent : pre.textContent
   
+  const copyButton = pre.querySelector('.copy-button')
+  const originalContent = copyButton.innerHTML
+  
   try {
     await navigator.clipboard.writeText(text)
-    ElMessage.success('代码已复制到剪贴板')
+    
+    // 更改按钮为成功状态
+    copyButton.innerHTML = `
+      <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16" fill="currentColor">
+        <path d="M912 190h-69.9c-9.8 0-19.1 4.5-25.1 12.2l-273 347.7-101.6-129.3c-6-7.6-15.2-12.2-25.1-12.2H347c-6.5 0-10.3 7.4-6.5 12.7l175.6 223c4.4 5.6 12.4 5.6 16.8 0l298.2-379.4c3.8-5.3 0-12.7-6.5-12.7z"></path>
+      </svg>
+      <span>Copied</span>
+    `
+    
+    // 2秒后恢复原状
+    setTimeout(() => {
+      copyButton.innerHTML = originalContent
+    }, 2000)
+    
   } catch (err) {
     // 降级处理：使用传统方法
     const textArea = document.createElement('textarea')
@@ -162,12 +174,27 @@ async function copyCode(pre) {
     textArea.select()
     document.execCommand('copy')
     document.body.removeChild(textArea)
-    ElMessage.success('代码已复制到剪贴板')
+    
+    // 更改按钮为成功状态
+    copyButton.innerHTML = `
+      <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16" fill="currentColor">
+        <path d="M912 190h-69.9c-9.8 0-19.1 4.5-25.1 12.2l-273 347.7-101.6-129.3c-6-7.6-15.2-12.2-25.1-12.2H347c-6.5 0-10.3 7.4-6.5 12.7l175.6 223c4.4 5.6 12.4 5.6 16.8 0l298.2-379.4c3.8-5.3 0-12.7-6.5-12.7z"></path>
+      </svg>
+      <span>Copied</span>
+    `
+    
+    // 2秒后恢复原状
+    setTimeout(() => {
+      copyButton.innerHTML = originalContent
+    }, 2000)
   }
 }
 
 // 运行JavaScript代码或HTML代码
 function runCode(pre) {
+  const runButton = pre.querySelector('.run-button')
+  const originalContent = runButton.innerHTML
+  
   const code = pre.querySelector('code')
   const codeText = code ? code.textContent : pre.textContent
   
@@ -196,47 +223,17 @@ function runCode(pre) {
     runJavaScriptCode(codeText, outputDiv)
   }
   
-  // 移除这行代码，不再显示顶部提示
-  // ElMessage.success('代码运行完成')
-  
-  // 可选：在按钮附近显示临时提示
-  showButtonTip(pre, '运行完成!')
-}
-
-// 在按钮附近显示临时提示
-function showButtonTip(pre, message) {
-  const buttonContainer = pre.querySelector('.code-buttons')
-  if (!buttonContainer) return
-  
-  // 创建提示元素
-  const tip = document.createElement('div')
-  tip.textContent = message
-  tip.style.cssText = `
-    position: absolute;
-    left: -100px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(64, 158, 255, 0.7);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 800px;
-    white-space: nowrap;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.25);
-    border: none;
-    font-family: inherit;
-    backdrop-filter: blur(10px);
+  // 更改按钮为执行成功状态
+  runButton.innerHTML = `
+    <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16" fill="currentColor">
+      <path d="M912 190h-69.9c-9.8 0-19.1 4.5-25.1 12.2l-273 347.7-101.6-129.3c-6-7.6-15.2-12.2-25.1-12.2H347c-6.5 0-10.3 7.4-6.5 12.7l175.6 223c4.4 5.6 12.4 5.6 16.8 0l298.2-379.4c3.8-5.3 0-12.7-6.5-12.7z"></path>
+    </svg>
+    <span>Executed</span>
   `
   
-  buttonContainer.appendChild(tip)
-  
-  // 2秒后移除提示
+  // 2秒后恢复原状
   setTimeout(() => {
-    if (tip.parentNode) {
-      tip.parentNode.removeChild(tip)
-    }
+    runButton.innerHTML = originalContent
   }, 2000)
 }
 

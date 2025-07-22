@@ -47,7 +47,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import MonacoEditor from '@guolao/vue-monaco-editor' // Changed import
+import MonacoEditor from '@guolao/vue-monaco-editor' 
 import { VideoPlay, Delete, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 

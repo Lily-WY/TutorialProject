@@ -40,6 +40,8 @@ const activePath = computed(() => route.fullPath)
   /* 设置固定高度和滚动 */
   height: calc(100vh - 85px);
   overflow-y: auto;
+  position: relative;
+  z-index: 1000; /* 确保菜单在其他元素之上 */
 }
 
 /* 自定义滚动条样式 */
@@ -56,8 +58,6 @@ const activePath = computed(() => route.fullPath)
   background: #e3e3e3; /* 滚动条滑块颜色（浅灰色） */
   border-radius: 3px;
 }
-
-
 
 /* Firefox 滚动条样式 */
 .el-menu {

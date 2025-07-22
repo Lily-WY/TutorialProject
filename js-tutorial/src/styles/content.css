@@ -41,8 +41,8 @@
 }
 
 .markdown-content pre {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color, #e5e7eb);
   padding: 16px;
   border-radius: 8px;
   overflow: auto;
@@ -50,6 +50,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   font-size: 16px;
   line-height: 1.6;
+  transition: all 0.3s ease;
 }
 
 .markdown-content pre code {
@@ -57,7 +58,7 @@
   padding: 0;
   border: none;
   font-size: 1.1rem;
-  color: #2d3748;
+  color: var(--text-color);
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
@@ -80,14 +81,15 @@
   align-items: center;
   gap: 4px;
   transition: all 0.2s ease;
-  color: #6b7280;
+  color: var(--text-color);
+  opacity: 0.7;
   font-size: 12px;
   white-space: nowrap;
 }
 
 .markdown-content .code-button:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: #409eff;
+  background: var(--hover-bg);
+  opacity: 1;
 }
 
 .markdown-content .code-button svg.icon {
@@ -111,52 +113,45 @@
 .markdown-content .playground-button {
   color: #409eff;
   border-color: #c6e2ff;
-  background: #ecf5ff;
+  background: rgba(64, 158, 255, 0.1);
 }
 
 .markdown-content .run-button:hover,
 .markdown-content .copy-button:hover,
 .markdown-content .playground-button:hover {
-  background: #c6e2ff;
-  border-color: #79bbff;
+  background: rgba(64, 158, 255, 0.2);
   color: #337ecc;
-  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.15);
 }
 
 .markdown-content .code-output {
   margin-top: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color, #e5e7eb);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--bg-color);
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 16px; /* 添加底部边距，避免重叠 */
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
 }
 
 .markdown-content .output-title {
-  background: #f8fafc;
-  padding: 8px 16px; /* 减少内边距 */
-  font-size: 0.9em; /* 稍微减小字体 */
+  background: var(--hover-bg);
+  padding: 8px 16px;
+  font-size: 0.9em;
   font-weight: 600;
-  color: #374151;
-  border-bottom: 1px solid #e5e7eb;
-  margin: 0; /* 移除边距 */
-}
-
-/* 确保iframe不会有额外的边距或边框 */
-.markdown-content .code-output iframe {
-  border: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: block !important;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  margin: 0;
+  transition: all 0.3s ease;
 }
 
 .markdown-content .output-content {
   padding: 16px;
   max-height: 300px;
   overflow-y: auto;
-  background: #ffffff;
+  background: var(--bg-color);
   font-size: 1em;
+  transition: all 0.3s ease;
 }
 
 .markdown-content .output-line {
@@ -167,7 +162,7 @@
 }
 
 .markdown-content .output-log {
-  color: #24292e;
+  color: var(--text-color);
 }
 
 .markdown-content .output-error {
