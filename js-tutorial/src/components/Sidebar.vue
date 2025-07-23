@@ -1,6 +1,10 @@
 <template>
-  <el-menu :default-active="activePath" class="el-menu-vertical-demo"
-    active-text-color="#409EFF" router unique-opened>
+  <el-menu :default-active="activePath" 
+           :default-openeds="defaultOpeneds"
+           class="el-menu-vertical-demo"
+           active-text-color="#409EFF" 
+           router 
+           unique-opened>
     <template v-for="section in menu" :key="section.id">
       <!-- 每个一级目录 -->
       <el-sub-menu :index="`/tutorial/${section.id}`">
@@ -27,42 +31,52 @@ import '@/styles/index.css'
 
 const route = useRoute()
 const activePath = computed(() => route.fullPath)
+
+// 设置默认展开的菜单项（第一个菜单）
+const defaultOpeneds = computed(() => {
+  const firstSection = Object.keys(menu)[0]
+  return [`/tutorial/${firstSection}`]
+})
 </script>
 
 
 <style scoped>
 .el-menu {
   border-right: none;
-  margin-top: 65px;
+  margin-top: 0; /* 移除上边距 */
   margin-left: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   color: var(--text-color);
-  /* 设置固定高度和滚动 */
-  height: calc(100vh - 85px);
+  /* 固定定位，让侧边栏在滚动时保持可见 */
+  position: fixed;
+  top: 128px; /* 从头部下方开始 */
+  left: 0;
+  width: 220px; /* 设置固定宽度 */
+  height: calc(100vh - 95px); /* 从头部下方到底部 */
   overflow-y: auto;
-  position: relative;
-  z-index: 1000; /* 确保菜单在其他元素之上 */
+  z-index: 1000;
+  background: var(--bg-color); /* 确保有背景色 */
 }
 
 /* 自定义滚动条样式 */
 .el-menu::-webkit-scrollbar {
-  width: 6px; /* 滚动条宽度 */
+  width: 6px;
 }
 
 .el-menu::-webkit-scrollbar-track {
-  background: #f1f1f1; /* 滚动条轨道颜色 */
+  background: #f1f1f1;
   border-radius: 3px;
 }
 
 .el-menu::-webkit-scrollbar-thumb {
-  background: #e3e3e3; /* 滚动条滑块颜色（浅灰色） */
+  background: #e3e3e3;
   border-radius: 3px;
 }
 
 /* Firefox 滚动条样式 */
 .el-menu {
   scrollbar-width: thin;
-  scrollbar-color: #d0d0d0 #f1f1f1; /* 滑块颜色 轨道颜色 */
+  scrollbar-color: #d0d0d0 #f1f1f1;
 }
 
 /* 一级菜单标题字体 */
@@ -70,6 +84,9 @@ const activePath = computed(() => route.fullPath)
   font-size: 18px;
   color: var(--text-color);
   font-family: inherit;
+  padding: 0 20px !important;
+  height: 56px !important;
+  line-height: 56px !important;
 }
 
 /* 一级菜单标题悬停背景 */
@@ -82,6 +99,9 @@ const activePath = computed(() => route.fullPath)
   font-size: 17px;
   color: var(--text-color);
   font-family: inherit;
+  padding: 0 20px 0 40px !important;
+  height: 50px !important;
+  line-height: 50px !important;
 }
 
 /* 子菜单项悬停背景 */

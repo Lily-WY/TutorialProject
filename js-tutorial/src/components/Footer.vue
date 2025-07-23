@@ -24,27 +24,28 @@ const currentYear = computed(() => new Date().getFullYear())
 <style scoped>
 .footer {
   background-color: var(--bg-color);
+  border-top: 1px solid var(--border-color, #e5e7eb);
   margin-top: 40px;
+  margin-left: 220px; /* 与主内容区保持一致的左边距 */
   transition: background-color 0.3s ease, color 0.3s ease;
   height: 95px;
   display: flex;
-  align-items: center; /* 垂直居中 */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  align-items: center;
 }
 
 .footer-content {
-  max-width: 1200px; /* 与 Header 保持一致的最大宽度 */
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 40px; /* 与 Header 保持一致的左右内边距 */
-  width: 100%; /* 这里保持 100% 是为了在容器内占满宽度 */
+  padding: 0 40px; /* 与主内容区保持一致的左右内边距 */
+  width: 100%;
   display: flex;
-  justify-content: center; /* 水平居中 */
+  justify-content: center;
 }
 
 .center-content {
   display: flex;
   flex-direction: column;
-  align-items: center; /* 内容居中 */
+  align-items: center;
   gap: 8px;
 }
 
@@ -77,6 +78,10 @@ const currentYear = computed(() => new Date().getFullYear())
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .footer {
+    margin-left: 0; /* 小屏幕下移除左边距 */
+  }
+  
   .footer-content {
     padding: 0 20px;
   }
