@@ -80,6 +80,8 @@ const currentYear = computed(() => new Date().getFullYear())
 @media (max-width: 768px) {
   .footer {
     margin-left: 0; /* 小屏幕下移除左边距 */
+    margin-right: 0; /* 去除右边距 */
+    margin-top: 20px; /* 减少顶部边距 */
   }
   
   .footer-content {

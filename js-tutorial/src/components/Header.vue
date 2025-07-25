@@ -1,44 +1,103 @@
 <template>
   <el-header class="header">
     <div class="left">
+      <!-- 手机端菜单开关按钮 -->
+      <el-icon class="menu-toggle" @click="toggleSidebar" v-show="isMobile">
+        <component :is="sidebarVisible ? Fold : Expand" />
+      </el-icon>
       <img src="@/assets/logo.png" alt="Logo" class="logo" />
     </div>
+
     <div class="right">
-      <el-input
-        v-model="inputValue"
-        placeholder="请输入搜索内容"
-        :suffix-icon="Search"
-        size="large"
-        class="search-box"
-      />
-      <div class="nav">
-        <el-menu mode="horizontal" :ellipsis="false" class="menu" :default-active="active" router>
-          <el-menu-item index="/tutorial/entry/what-is-js">基础</el-menu-item>
-          <el-menu-item index="/tutorial/advanced/promise">进阶</el-menu-item>
-          <el-menu-item index="/tutorial/projects/todolist">练习</el-menu-item>
-          <el-menu-item index="/playground">在线编辑器</el-menu-item>
-        </el-menu>
+      <!-- 手机端图标组 -->
+      <div class="icon-group" v-if="isMobile">
+        <el-icon><Search /></el-icon>
+        <el-icon @click="toggleTheme">
+          <component :is="isDark ? Sunny : Moon" />
+        </el-icon>
+        <el-icon @click="goToPlayground"><EditPen /></el-icon>
       </div>
-      <div class="theme-toggle" @click="toggleTheme">
-        <el-icon v-if="!isDark" size="26" color="#525050"><Moon /></el-icon>
-        <el-icon v-else size="26"><Sunny /></el-icon>
-      </div>
+
+      <!-- 桌面端内容（原样保留） -->
+      <template v-else>
+        <el-input
+          v-model="inputValue"
+          placeholder="请输入搜索内容"
+          :suffix-icon="Search"
+          size="large"
+          class="search-box"
+        />
+        <div class="nav">
+          <el-menu mode="horizontal" :ellipsis="false" class="menu" :default-active="active" router>
+            <el-menu-item index="/tutorial/entry/what-is-js">基础</el-menu-item>
+            <el-menu-item index="/tutorial/advanced/promise">进阶</el-menu-item>
+            <el-menu-item index="/tutorial/projects/todolist">练习</el-menu-item>
+            <el-menu-item index="/playground">在线编辑器</el-menu-item>
+          </el-menu>
+        </div>
+        <div class="theme-toggle" @click="toggleTheme">
+          <el-icon v-if="!isDark" size="26" color="#525050"><Moon /></el-icon>
+          <el-icon v-else size="26"><Sunny /></el-icon>
+        </div>
+      </template>
     </div>
   </el-header>
 </template>
 
+
 <script setup>
-import { Search, Sunny, Moon } from '@element-plus/icons-vue'
-import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { Search, Sunny, Moon, Fold, Expand, EditPen } from '@element-plus/icons-vue'
+import { ref, onMounted, watch, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
+
 const inputValue = ref('')
 const active = ref('1')
-const isDark = ref(false) // 默认是浅色
+const isDark = ref(false)
 
-// 页面加载时判断本地存储是否保存了深色主题
+const isMobile = ref(false)
+const sidebarVisible = ref(false)
+
+// 切换侧边栏 - 发送事件给 Sidebar 组件
+const toggleSidebar = () => {
+  sidebarVisible.value = !sidebarVisible.value
+  // 发送自定义事件通知侧边栏切换状态
+  document.dispatchEvent(new CustomEvent('toggle-sidebar', { 
+    detail: { visible: sidebarVisible.value } 
+  }))
+}
+
+// 主题切换
+const toggleTheme = () => {
+  isDark.value = !isDark.value
+}
+
+const goToPlayground = () => {
+  router.push('/playground')
+}
+
+// 监听窗口宽度，判断是否为手机
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 768
+  // 移动端默认隐藏侧边栏
+  if (isMobile.value) {
+    sidebarVisible.value = false
+  }
+}
+
+// 监听侧边栏关闭事件（从 Sidebar 组件发出）
+const handleSidebarClosed = () => {
+  sidebarVisible.value = false
+}
+
 onMounted(() => {
+  handleResize()
+  window.addEventListener('resize', handleResize)
+  // 监听侧边栏关闭事件
+  document.addEventListener('sidebar-closed', handleSidebarClosed)
+
   const saved = localStorage.getItem('isDark')
   if (saved === 'true') {
     isDark.value = true
@@ -46,17 +105,10 @@ onMounted(() => {
   }
 })
 
-// 监听 isDark 变化，动态添加/移除 .dark 类，并保存状态
 watch(isDark, (val) => {
-  const html = document.documentElement
-  html.classList.toggle('dark', val)
+  document.documentElement.classList.toggle('dark', val)
   localStorage.setItem('isDark', val)
 })
-
-// 点击切换主题
-const toggleTheme = () => {
-  isDark.value = !isDark.value
-}
 </script>
 
 <style scoped>
@@ -118,5 +170,43 @@ const toggleTheme = () => {
 
 .theme-toggle {
   cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0 20px; 
+    margin: 0; 
+    border: none;
+    box-shadow: none; 
+    width: 100%; 
+    position: relative;
+    top: auto;
+  }
+
+  .search-box,
+  .nav,
+  .theme-toggle {
+    display: none !important;
+  }
+
+  .menu-toggle {
+    cursor: pointer;
+    font-size: 25px;
+    margin-left: -20px;
+    color: #545454;
+  }
+
+  .icon-group {
+    display: flex;
+    align-items: end;
+    gap: 30px;
+    margin-right: -20px;
+    font-size: 23px;
+  }
+
+  .logo {
+    width: 150px;
+    height: 150px;
+  }
 }
 </style>

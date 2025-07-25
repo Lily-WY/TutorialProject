@@ -51,6 +51,7 @@
   font-size: 16px;
   line-height: 1.6;
   transition: all 0.3s ease;
+  margin-right: 15px;
 }
 
 .markdown-content pre code {
@@ -132,6 +133,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-bottom: 16px;
   transition: all 0.3s ease;
+  margin-right: 15px;
 }
 
 .markdown-content .output-title {
@@ -304,4 +306,17 @@
 
 .no-underline {
   text-decoration: none;
+}
+
+/* 移动端去除外部边距 */
+@media (max-width: 768px) {
+  .content-container {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .markdown-content {
+    margin: 0;
+    padding: 15px; /* 只保留内容的内边距 */
+  }
 }

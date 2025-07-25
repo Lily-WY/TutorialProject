@@ -15,3 +15,27 @@
   --hover-bg: #2a2a2a;
   --border-color: #30363d;
 }
+
+/* 移动端去除默认边距 */
+@media (max-width: 768px) {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  #app {
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* 确保所有容器在移动端都没有外部边距 */
+  .el-container {
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  .el-main {
+    padding: 0 !important;
+  }
+}
