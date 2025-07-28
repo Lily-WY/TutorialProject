@@ -3,6 +3,16 @@
     <!-- 内容渲染 -->
     <div v-html="content" ref="contentContainer" />
 
+    <!-- 回到顶部的火箭图标 (仅桌面端显示) -->
+    <div 
+      v-show="showRocket && !isMobile" 
+      class="back-to-top-rocket" 
+      @click="scrollToTop"
+      title="回到顶部"
+    >
+      <img src="@/assets/rocket.png" alt="回到顶部" />
+    </div>
+
     <!-- 导航按钮区域 -->
     <div class="navigation-section">
       <!-- 上一节按钮 -->
@@ -33,9 +43,8 @@
   </div>
 </template>
 
-
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import axios from 'axios'
 import { marked } from 'marked' 
 import '@/styles/index.css'
@@ -61,6 +70,32 @@ const props = defineProps({
 
 const content = ref('加载中...')
 const contentContainer = ref(null)
+
+// 回到顶部相关状态
+const showRocket = ref(false)
+const isMobile = ref(false)
+
+// 检查是否为移动端
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
+// 监听滚动事件，控制火箭图标显示
+const handleScroll = () => {
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+  const windowHeight = window.innerHeight
+  
+  // 当页面滚动超过一半屏幕高度时显示火箭
+  showRocket.value = scrollTop > windowHeight / 2
+}
+
+// 回到顶部函数
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
 
 // 配置 marked（可选）
 marked.setOptions({
@@ -366,7 +401,21 @@ function formatOutput(value) {
   return String(value)
 }
 
-onMounted(fetchContent)
+onMounted(() => {
+  fetchContent()
+  checkMobile()
+  
+  // 添加事件监听器
+  window.addEventListener('scroll', handleScroll)
+  window.addEventListener('resize', checkMobile)
+})
+
+onUnmounted(() => {
+  // 清理事件监听器
+  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', checkMobile)
+})
+
 watch(() => props.path, fetchContent)
 
 const route = useRoute()
@@ -436,4 +485,30 @@ function openInPlayground(pre) {
 </script>
 
 <style scoped>
+/* 回到顶部火箭图标样式 */
+.back-to-top-rocket {
+  position: fixed;
+  right: 90px;
+  bottom: 300px; /* 在 navigation-section 上方 */
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.1s ease;
+  rotate: -45deg;
+}
+
+.back-to-top-rocket img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+/* 确保火箭图标只在桌面端显示 */
+@media (max-width: 768px) {
+  .back-to-top-rocket {
+    display: none !important;
+  }
+}
 </style>
