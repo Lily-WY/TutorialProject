@@ -4,29 +4,28 @@
       <Header @toggle-sidebar="toggleSidebar" />
     </el-header>
 
-    <!-- 🔧 侧边栏浮层模式：仅手机端显示 -->
-    <transition name="fade">
-      <div
-        class="sidebar-mask"
-        v-if="isMobile && sidebarVisible"
-        @click.self="closeSidebar"
+    <el-container class="body-container">
+      <!-- 侧边栏：桌面端固定显示，移动端可切换 -->
+      <el-aside 
+        :width="isMobile ? '100%' : '220px'" 
+        v-show="!isMobile || sidebarVisible"
+        class="sidebar-container"
+        :class="{ 'mobile-sidebar': isMobile }"
       >
         <Sidebar :section="section" :subsection="subsection" @close-sidebar="closeSidebar" />
-      </div>
-    </transition>
-
-    <!-- 🔧 桌面端结构 -->
-    <el-container class="body-container">
-      <el-aside width="220px" v-show="!isMobile">
-        <Sidebar :section="section" :subsection="subsection" />
       </el-aside>
 
-      <el-main class="main-content">
+      <!-- 主内容区：移动端隐藏侧边栏时显示，桌面端始终显示 -->
+      <el-main 
+        class="main-content"
+        v-show="!isMobile || !sidebarVisible"
+        :class="{ 'mobile-main': isMobile }"
+      >
         <TutorialContent :path="subsection || 'what-is-js'" />
       </el-main>
     </el-container>
 
-    <div class="footer-wrapper">
+    <div class="footer-wrapper" v-show="!isMobile || !sidebarVisible">
       <Footer />
     </div>
   </div>
@@ -48,16 +47,23 @@ defineProps({
 const sidebarVisible = ref(false)
 const isMobile = ref(window.innerWidth <= 768)
 
+// 切换侧边栏显示状态
 const toggleSidebar = () => {
   sidebarVisible.value = !sidebarVisible.value
+  console.log('TutorialLayout - 侧边栏状态:', sidebarVisible.value)
 }
+
+// 关闭侧边栏
 const closeSidebar = () => {
   sidebarVisible.value = false
 }
 
 const handleResize = () => {
+  const wasMobile = isMobile.value
   isMobile.value = window.innerWidth <= 768
-  if (!isMobile.value) {
+  
+  // 如果从移动端切换到桌面端，重置侧边栏状态
+  if (wasMobile && !isMobile.value) {
     sidebarVisible.value = false
   }
 }
@@ -65,6 +71,7 @@ const handleResize = () => {
 onMounted(() => {
   window.addEventListener('resize', handleResize)
 })
+
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
 })
@@ -92,8 +99,13 @@ onBeforeUnmount(() => {
   min-height: calc(100vh - 95px);
 }
 
+.sidebar-container {
+  transition: all 0.3s ease;
+}
+
 .main-content {
   margin-top: 45px;
+  transition: all 0.3s ease;
 }
 
 .footer-wrapper {
@@ -101,44 +113,7 @@ onBeforeUnmount(() => {
   margin-top: auto;
 }
 
-/* 🔧 手机端浮层侧边栏遮罩 */
-.sidebar-mask {
-  position: fixed;
-  top: 95px;
-  left: 0;
-  width: 80%;
-  max-width: 260px;
-  height: calc(100vh - 95px);
-  background: var(--bg-color);
-  z-index: 2000;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  transition: transform 0.3s ease;
-}
-
-/* 遮罩层外部灰色背景 */
-.sidebar-mask::after {
-  content: '';
-  position: fixed;
-  top: 95px;
-  left: 80%;
-  width: 20%;
-  height: calc(100vh - 95px);
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: -1;
-}
-
-/* 淡入淡出动画 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-/* 移动端样式 - 去除外部边框和边距 */
+/* 移动端样式 */
 @media (max-width: 768px) {
   .common-layout {
     margin: 0;
@@ -151,22 +126,32 @@ onBeforeUnmount(() => {
   }
   
   .body-container {
-    margin-top: 0px; 
+    margin-top: 0;
     margin-left: 0;
     margin-right: 0;
     padding: 0;
+    flex-direction: column; /* 移动端垂直布局 */
   }
   
-  .main-content {
-    margin-top: 0px; 
+  .sidebar-container.mobile-sidebar {
+    width: 100% !important;
+    height: auto;
+    order: 1; /* 侧边栏在上方 */
+  }
+  
+  .main-content.mobile-main {
+    margin-top: 0;
     margin-left: 0;
     margin-right: 0;
-    padding: 15px; 
+    padding: 15px;
+    width: 100%;
+    order: 2; /* 主内容在下方 */
   }
   
   .footer-wrapper {
     margin: 0;
     padding: 0;
+    order: 3; /* Footer 在最下方 */
   }
 }
 </style>

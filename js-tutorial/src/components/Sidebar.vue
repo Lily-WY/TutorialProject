@@ -118,4 +118,59 @@ const defaultOpeneds = computed(() => {
 .el-menu-item {
   font-family: "Times New Roman", Times, serif;
 }
+
+/* 移动端样式 - 只修改移动端 */
+@media (max-width: 768px) {
+  .el-menu {
+    position: static; /* 移动端改为静态定位 */
+    margin-top: 20px;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100% !important;
+    height: auto;
+    min-height: 50vh;
+    box-shadow: none;
+    padding: 0 15px;
+    top: auto;
+    left: auto;
+    z-index: auto;
+  }
+  
+  /* 移动端一级菜单标题 - 放大字体 */
+  ::v-deep(.el-sub-menu__title) {
+    font-size: 22px !important; /* 从18px增加到22px */
+    height: 60px !important; /* 增加高度 */
+    line-height: 60px !important;
+    padding: 0 25px !important; /* 增加左右内边距 */
+  }
+  
+  /* 移动端子菜单项 - 放大字体 */
+  ::v-deep(.el-menu-item) {
+    font-size: 20px !important; /* 从17px增加到20px */
+    height: 55px !important; /* 增加高度 */
+    line-height: 55px !important;
+    padding: 0 25px 0 45px !important; /* 增加内边距 */
+  }
+}
+
+/* 更小屏幕的字体调整 */
+@media (max-width: 480px) {
+  .el-menu {
+    padding: 0 10px;
+  }
+  
+  ::v-deep(.el-sub-menu__title) {
+    font-size: 20px !important;
+    height: 55px !important;
+    line-height: 55px !important;
+    padding: 0 20px !important;
+  }
+  
+  ::v-deep(.el-menu-item) {
+    font-size: 18px !important;
+    height: 50px !important;
+    line-height: 50px !important;
+    padding: 0 20px 0 40px !important;
+  }
+}
 </style>

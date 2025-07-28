@@ -1,7 +1,7 @@
 <template>
   <el-header class="header">
     <div class="left">
-      <!-- 手机端菜单开关按钮 -->
+      <!-- 移动端菜单开关按钮 -->
       <el-icon class="menu-toggle" @click="toggleSidebar" v-show="isMobile">
         <component :is="sidebarVisible ? Fold : Expand" />
       </el-icon>
@@ -9,9 +9,9 @@
     </div>
 
     <div class="right">
-      <!-- 手机端图标组 -->
+      <!-- 移动端图标组 -->
       <div class="icon-group" v-if="isMobile">
-        <el-icon><Search /></el-icon>
+        <el-icon @click="toggleMobileSearch"><Search /></el-icon>
         <el-icon @click="toggleTheme">
           <component :is="isDark ? Sunny : Moon" />
         </el-icon>
@@ -41,32 +41,46 @@
         </div>
       </template>
     </div>
+    
+    <!-- 移动端搜索框覆盖层 -->
+    <div v-if="showMobileSearch" class="mobile-search-overlay" @click="closeMobileSearch">
+      <div class="mobile-search-container" @click.stop>
+        <el-input
+          v-model="inputValue"
+          placeholder="请输入搜索内容"
+          size="large"
+          class="mobile-search-input"
+          autofocus
+        />
+        <el-button @click="closeMobileSearch" type="text">取消</el-button>
+      </div>
+    </div>
   </el-header>
 </template>
 
-
 <script setup>
 import { Search, Sunny, Moon, Fold, Expand, EditPen } from '@element-plus/icons-vue'
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
 
+// 定义 emit
+const emit = defineEmits(['toggle-sidebar'])
+
 const inputValue = ref('')
 const active = ref('1')
 const isDark = ref(false)
-
 const isMobile = ref(false)
 const sidebarVisible = ref(false)
+const showMobileSearch = ref(false)
 
-// 切换侧边栏 - 发送事件给 Sidebar 组件
+// 切换侧边栏 - 通过 emit 传递事件给父组件
 const toggleSidebar = () => {
   sidebarVisible.value = !sidebarVisible.value
-  // 发送自定义事件通知侧边栏切换状态
-  document.dispatchEvent(new CustomEvent('toggle-sidebar', { 
-    detail: { visible: sidebarVisible.value } 
-  }))
+  emit('toggle-sidebar')
+  console.log('侧边栏切换:', sidebarVisible.value) // 调试用
 }
 
 // 主题切换
@@ -78,6 +92,15 @@ const goToPlayground = () => {
   router.push('/playground')
 }
 
+// 移动端搜索
+const toggleMobileSearch = () => {
+  showMobileSearch.value = true
+}
+
+const closeMobileSearch = () => {
+  showMobileSearch.value = false
+}
+
 // 监听窗口宽度，判断是否为手机
 const handleResize = () => {
   isMobile.value = window.innerWidth <= 768
@@ -87,16 +110,9 @@ const handleResize = () => {
   }
 }
 
-// 监听侧边栏关闭事件（从 Sidebar 组件发出）
-const handleSidebarClosed = () => {
-  sidebarVisible.value = false
-}
-
 onMounted(() => {
   handleResize()
   window.addEventListener('resize', handleResize)
-  // 监听侧边栏关闭事件
-  document.addEventListener('sidebar-closed', handleSidebarClosed)
 
   const saved = localStorage.getItem('isDark')
   if (saved === 'true') {
@@ -131,12 +147,12 @@ watch(isDark, (val) => {
 .left {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .logo {
   height: 250px;
   width: 250px;
-  margin-right: 10px;
   object-fit: contain;
 }
 
@@ -172,15 +188,66 @@ watch(isDark, (val) => {
   cursor: pointer;
 }
 
+.menu-toggle {
+  cursor: pointer;
+  font-size: 24px;
+  color: var(--text-color);
+  display: none;
+}
+
+.icon-group {
+  display: none;
+  align-items: center;
+  gap: 20px;
+  font-size: 20px;
+}
+
+.icon-group .el-icon {
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+/* 移动端搜索覆盖层 */
+.mobile-search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 95px;
+}
+
+.mobile-search-container {
+  width: 100%;
+  background: var(--bg-color);
+  padding: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mobile-search-input {
+  flex: 1;
+}
+
 @media (max-width: 768px) {
   .header {
     padding: 0 20px; 
     margin: 0; 
     border: none;
     box-shadow: none; 
-    width: 100%; 
+    width: 100%;
     position: relative;
     top: auto;
+  }
+
+  .logo {
+    height: 150px;
+    width: 150px;
   }
 
   .search-box,
@@ -189,24 +256,21 @@ watch(isDark, (val) => {
     display: none !important;
   }
 
+  .menu-toggle,
+  .icon-group {
+    display: flex !important;
+  }
+
   .menu-toggle {
-    cursor: pointer;
+    margin-left: -10px;
     font-size: 25px;
-    margin-left: -20px;
     color: #545454;
   }
 
   .icon-group {
-    display: flex;
-    align-items: end;
-    gap: 30px;
-    margin-right: -20px;
+    margin-right: -10px;
     font-size: 23px;
-  }
-
-  .logo {
-    width: 150px;
-    height: 150px;
+    gap: 30px;
   }
 }
 </style>
