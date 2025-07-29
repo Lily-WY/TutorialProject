@@ -101,7 +101,7 @@
 
 .markdown-content .code-button span {
   font-family: inherit;
-  font-weight: 500;
+  font-weight: 800;
 }
 
 /* 深色模式下的悬浮效果 */
@@ -320,5 +320,47 @@
   .markdown-content {
     margin: 0;
     padding: 15px; /* 只保留内容的内边距 */
+  }
+  
+  /* 移动端代码块顶部添加空间给按钮 */
+  .markdown-content pre {
+    padding-top: 50px; /* 增加顶部内边距，给按钮留空间 */
+    margin-right: 20px; /* 调整右边距 */
+  }
+  
+  /* 移动端代码按钮调整 */
+  .markdown-content .code-buttons {
+    top: 8px; /* 稍微调整按钮位置 */
+    left: 8px;
+  }
+  
+  /* 移动端按钮字体调整 */
+  .markdown-content .code-button {
+    font-size: 14px; 
+    padding: 4px 6px; /* 减小内边距 */
+  }
+}
+
+/* 更小屏幕的调整 */
+@media (max-width: 480px) {
+  .markdown-content pre {
+    padding-top: 45px; /* 小屏幕稍微减少顶部内边距 */
+    margin-right: 15px;
+  }
+  
+  .markdown-content .code-buttons {
+    top: 6px;
+    left: 6px;
+    gap: 4px; /* 减少按钮间距 */
+  }
+  
+  .markdown-content .code-button {
+    font-size: 14px;
+    padding: 3px 5px;
+  }
+  
+  .markdown-content .code-button svg.icon {
+    width: 14px; /* 稍微减小图标尺寸 */
+    height: 14px;
   }
 }

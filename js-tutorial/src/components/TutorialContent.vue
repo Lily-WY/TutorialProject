@@ -322,68 +322,88 @@ function runJavaScriptCode(codeText, outputDiv) {
   console.log = (...args) => {
     logs.push({ type: 'log', content: args.map(arg => formatOutput(arg)).join(' ') })
     originalLog.apply(console, args)
+    // 实时更新输出显示
+    updateOutput()
   }
   
   console.error = (...args) => {
     logs.push({ type: 'error', content: args.map(arg => formatOutput(arg)).join(' ') })
     originalError.apply(console, args)
+    updateOutput()
   }
   
   console.warn = (...args) => {
     logs.push({ type: 'warn', content: args.map(arg => formatOutput(arg)).join(' ') })
     originalWarn.apply(console, args)
+    updateOutput()
   }
   
-  // 重写alert方法 - 既显示真实弹窗，也记录到输出
+  // 重写alert方法
   const originalAlert = window.alert
   window.alert = (message) => {
     const messageStr = String(message)
     logs.push({ type: 'alert', content: messageStr })
-    // 调用原始的alert方法显示真实弹窗
     originalAlert(messageStr)
+    updateOutput()
+  }
+  
+  // 实时更新输出显示的函数
+  function updateOutput() {
+    outputContent.innerHTML = ''
+    logs.forEach(log => {
+      const logElement = document.createElement('div')
+      logElement.className = `output-line output-${log.type}`
+      
+      if (log.type === 'alert') {
+        logElement.innerHTML = `<span class="output-prefix">[Alert]</span> ${log.content}`
+      } else if (log.type === 'return') {
+        logElement.innerHTML = `<span class="output-prefix">[Return]</span> ${log.content}`
+      } else if (log.type === 'success') {
+        logElement.innerHTML = `<span class="output-prefix">[Success]</span> ${log.content}`
+      } else {
+        logElement.textContent = log.content
+      }
+      
+      outputContent.appendChild(logElement)
+    })
   }
   
   try {
-    // 执行代码
-    const result = new Function(codeText)()
+    // 使用 eval 而不是 new Function，以便支持异步代码
+    const result = eval(codeText)
     
-    // 如果有返回值，显示返回值
+    // 如果有同步返回值，显示返回值
     if (result !== undefined) {
       logs.push({ type: 'return', content: formatOutput(result) })
     }
     
-    // 如果没有任何输出，显示成功消息
-    if (logs.length === 0) {
-      logs.push({ type: 'success', content: '代码执行成功，无输出' })
-    }
+    // 初始显示输出
+    updateOutput()
+    
+    // 设置一个定时器，在一定时间后恢复console方法
+    setTimeout(() => {
+      console.log = originalLog
+      console.error = originalError
+      console.warn = originalWarn
+      window.alert = originalAlert
+      
+      // 如果没有任何输出，显示成功消息
+      if (logs.length === 0) {
+        logs.push({ type: 'success', content: '代码执行成功，无输出' })
+        updateOutput()
+      }
+    }, 5000) // 5秒后恢复，给异步代码足够时间执行
     
   } catch (error) {
     logs.push({ type: 'error', content: error.message })
-  } finally {
-    // 恢复原始方法
+    updateOutput()
+    
+    // 立即恢复原始方法
     console.log = originalLog
     console.error = originalError
     console.warn = originalWarn
     window.alert = originalAlert
   }
-  
-  // 显示输出
-  logs.forEach(log => {
-    const logElement = document.createElement('div')
-    logElement.className = `output-line output-${log.type}`
-    
-    if (log.type === 'alert') {
-      logElement.innerHTML = `<span class="output-prefix">[Alert]</span> ${log.content}`
-    } else if (log.type === 'return') {
-      logElement.innerHTML = `<span class="output-prefix">[Return]</span> ${log.content}`
-    } else if (log.type === 'success') {
-      logElement.innerHTML = `<span class="output-prefix">[Success]</span> ${log.content}`
-    } else {
-      logElement.textContent = log.content
-    }
-    
-    outputContent.appendChild(logElement)
-  })
 }
 
 // 格式化输出内容
