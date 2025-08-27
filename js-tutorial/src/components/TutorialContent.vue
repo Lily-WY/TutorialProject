@@ -407,17 +407,58 @@ function runJavaScriptCode(codeText, outputDiv) {
 }
 
 // 格式化输出内容
+// 格式化输出内容
 function formatOutput(value) {
   if (value === null) return 'null'
   if (value === undefined) return 'undefined'
   if (typeof value === 'string') return `"${value}"`
+  
+  // 特殊处理 Set 对象
+  if (value instanceof Set) {
+    const setValues = Array.from(value).map(item => formatOutput(item)).join(', ')
+    return `Set(${value.size}) {${setValues}}`
+  }
+  
+  // 特殊处理 Map 对象
+  if (value instanceof Map) {
+    const mapEntries = Array.from(value.entries())
+      .map(([key, val]) => `${formatOutput(key)} => ${formatOutput(val)}`)
+      .join(', ')
+    return `Map(${value.size}) {${mapEntries}}`
+  }
+  
+  // 特殊处理 Date 对象
+  if (value instanceof Date) {
+    return value.toString()
+  }
+  
+  // 特殊处理数组
+  if (Array.isArray(value)) {
+    const arrayItems = value.map(item => formatOutput(item)).join(', ')
+    return `[${arrayItems}]`
+  }
+  
+  // 特殊处理函数
+  if (typeof value === 'function') {
+    return `[Function: ${value.name || 'anonymous'}]`
+  }
+  
+  // 处理其他对象
   if (typeof value === 'object') {
     try {
-      return JSON.stringify(value, null, 2)
+      // 检查是否是纯对象
+      if (value.constructor === Object) {
+        return JSON.stringify(value, null, 2)
+      } else {
+        // 对于其他类型的对象，尝试显示更有用的信息
+        return `${value.constructor.name} ${JSON.stringify(value, null, 2)}`
+      }
     } catch {
+      // 如果 JSON.stringify 失败，回退到 toString
       return String(value)
     }
   }
+  
   return String(value)
 }
 

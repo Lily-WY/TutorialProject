@@ -52,9 +52,16 @@
     "title": "进阶知识",
     "children": [
       { "title": "异步编程与 Promise", "path": "promise" },
-      { "title": "async/await", "path": "async-await" },
+      { "title": "async / await", "path": "async-await" },
       { "title": "模块化导入导出", "path": "modules" },
       { "title": "ES6+ 新特性", "path": "es6-features" }
+    ]
+  },
+  {
+    "id": "algorithms",
+    "title": "JS 经典算法",
+    "children": [
+      { "title": "字符串逆序", "path": "reverse" }
     ]
   },
   {
