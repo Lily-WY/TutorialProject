@@ -52,7 +52,7 @@ const defaultOpeneds = computed(() => {
   top: 128px; /* 从头部下方开始 */
   left: 0;
   width: 220px; /* 设置固定宽度 */
-  height: calc(100vh - 95px); /* 从头部下方到底部 */
+  height: calc(100vh - 128px); /* 从头部下方到底部 */
   overflow-y: auto;
   z-index: 1000;
   background: var(--bg-color); /* 确保有背景色 */

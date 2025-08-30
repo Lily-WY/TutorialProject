@@ -61,7 +61,17 @@
     "id": "algorithms",
     "title": "JS 经典算法",
     "children": [
-      { "title": "字符串逆序", "path": "reverse" }
+      { "title": "字符串逆序", "path": "reverse" },
+      { "title": "回文检测", "path": "palindrome" },
+      { "title": "最多字符统计", "path": "max-char" },
+      { "title": "数组分块", "path": "array-chunking" },
+      { "title": "标题格式化", "path": "title-case" },
+      { "title": "字母异位词", "path": "anagrams" },
+      { "title": "元音字母计数", "path": "count-vowels" },
+      { "title": "FizzBuzz 问题", "path": "fizz-buzz" },
+      { "title": "阶梯字符模式", "path": "steps-pattern" },
+      { "title": "金字塔字符模式", "path": "pyramid-pattern" },
+      { "title": "螺旋矩阵", "path": "spiral-matrix" }
     ]
   },
   {
