@@ -361,7 +361,12 @@ function runJavaScriptCode(codeText, outputDiv) {
       } else if (log.type === 'success') {
         logElement.innerHTML = `<span class="output-prefix">[Success]</span> ${log.content}`
       } else {
-        logElement.textContent = log.content
+        // 对于包含HTML实体的内容，使用innerHTML
+        if (log.content.includes('&nbsp;')) {
+          logElement.innerHTML = log.content
+        } else {
+          logElement.textContent = log.content
+        }
       }
       
       outputContent.appendChild(logElement)
@@ -407,11 +412,20 @@ function runJavaScriptCode(codeText, outputDiv) {
 }
 
 // 格式化输出内容
-// 格式化输出内容
 function formatOutput(value) {
   if (value === null) return 'null'
   if (value === undefined) return 'undefined'
-  if (typeof value === 'string') return `"${value}"`
+  
+  // 特殊处理字符串 - 去除引号，保留格式
+  if (typeof value === 'string') {
+    // 如果字符串包含空格且看起来像是图案/模式，保留原格式
+    if (value.includes(' ') && (value.includes('#') || value.includes('*') || value.includes('-'))) {
+      // 将空格转换为不换行空格，保持格式
+      return value.replace(/ /g, '&nbsp;')
+    }
+    // 直接返回字符串内容，不加引号
+    return value
+  }
   
   // 特殊处理 Set 对象
   if (value instanceof Set) {
@@ -434,7 +448,13 @@ function formatOutput(value) {
   
   // 特殊处理数组
   if (Array.isArray(value)) {
-    const arrayItems = value.map(item => formatOutput(item)).join(', ')
+    const arrayItems = value.map(item => {
+      // 对于数组内的字符串元素，保留引号以区分
+      if (typeof item === 'string') {
+        return `"${item}"`
+      }
+      return formatOutput(item)
+    }).join(', ')
     return `[${arrayItems}]`
   }
   

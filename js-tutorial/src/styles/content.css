@@ -154,6 +154,7 @@
   background: var(--bg-color);
   font-size: 1em;
   transition: all 0.3s ease;
+  white-space: pre;
 }
 
 .markdown-content .output-line {
@@ -161,6 +162,7 @@
   font-family: monospace;
   font-size: 1em;
   line-height: 1.4;
+  white-space: pre;
 }
 
 .markdown-content .output-log {
