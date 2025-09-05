@@ -43,22 +43,21 @@ const defaultOpeneds = computed(() => {
 <style scoped>
 .el-menu {
   border-right: none;
-  margin-top: 0; /* 移除上边距 */
+  margin-top: 0;
   margin-left: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   color: var(--text-color);
-  /* 固定定位，让侧边栏在滚动时保持可见 */
   position: fixed;
-  top: 128px; /* 从头部下方开始 */
+  top: 128px;
   left: 0;
-  width: 220px; /* 设置固定宽度 */
-  height: calc(100vh - 128px); /* 从头部下方到底部 */
+  width: 220px;
+  height: calc(100vh - 128px);
   overflow-y: auto;
   z-index: 1000;
-  background: var(--bg-color); /* 确保有背景色 */
+  background: var(--bg-color);
 }
 
-/* 自定义滚动条样式 */
+/* 亮色模式滚动条 */
 .el-menu::-webkit-scrollbar {
   width: 6px;
 }
@@ -73,10 +72,32 @@ const defaultOpeneds = computed(() => {
   border-radius: 3px;
 }
 
+.el-menu::-webkit-scrollbar-thumb:hover {
+  background: #d0d0d0;
+}
+
+/* 黑夜模式滚动条 - 使用.dark类选择器 */
+.dark .el-menu::-webkit-scrollbar-track {
+  background: #2d2d2d;
+}
+
+.dark .el-menu::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+}
+
+.dark .el-menu::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
+}
+
 /* Firefox 滚动条样式 */
 .el-menu {
   scrollbar-width: thin;
   scrollbar-color: #d0d0d0 #f1f1f1;
+}
+
+/* Firefox 黑夜模式 */
+.dark .el-menu {
+  scrollbar-color: #4a4a4a #2d2d2d;
 }
 
 /* 一级菜单标题字体 */
