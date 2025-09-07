@@ -52,7 +52,7 @@ import '@/styles/content.css'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import menu from '@/data/menu.json'
-import { Right, ArrowLeft, CopyDocument, VideoPlay } from '@element-plus/icons-vue'
+import { Right, ArrowLeft} from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 // Configure marked without CodeBlock handling
@@ -283,7 +283,7 @@ function runHTMLCode(htmlCode, outputDiv) {
   // 创建iframe来运行HTML代码
   const iframe = document.createElement('iframe')
   iframe.style.width = '100%'
-  iframe.style.height = '200px' // 减小高度
+  iframe.style.height = '200px' 
   iframe.style.border = '1px solid #ddd'
   iframe.style.borderRadius = '4px'
   iframe.style.background = 'white'
