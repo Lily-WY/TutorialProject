@@ -286,7 +286,7 @@ function runHTMLCode(htmlCode, outputDiv) {
   iframe.style.height = '200px' 
   iframe.style.border = '1px solid #ddd'
   iframe.style.borderRadius = '4px'
-  iframe.style.background = 'white'
+  iframe.style.backgroundColor = 'var(--bg-color)'
   iframe.style.display = 'block' // 确保显示为块级元素
   iframe.style.marginBottom = '0' // 移除底部边距
   

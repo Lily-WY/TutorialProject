@@ -18,15 +18,10 @@
         <el-icon @click="goToPlayground"><EditPen /></el-icon>
       </div>
 
-      <!-- 桌面端内容（原样保留） -->
+      <!-- 桌面端内容 -->
       <template v-else>
-        <el-input
-          v-model="inputValue"
-          placeholder="请输入搜索内容"
-          :suffix-icon="Search"
-          size="large"
-          class="search-box"
-        />
+        <SearchBox :is-mobile="false" />
+        
         <div class="nav">
           <el-menu mode="horizontal" :ellipsis="false" class="menu" :default-active="active" router>
             <el-menu-item index="/tutorial/entry/what-is-js">基础</el-menu-item>
@@ -35,6 +30,7 @@
             <el-menu-item index="/playground">在线编辑器</el-menu-item>
           </el-menu>
         </div>
+        
         <div class="theme-toggle" @click="toggleTheme">
           <el-icon v-if="!isDark" size="26" color="#525050"><Moon /></el-icon>
           <el-icon v-else size="26"><Sunny /></el-icon>
@@ -42,19 +38,13 @@
       </template>
     </div>
     
-    <!-- 移动端搜索框覆盖层 -->
-    <div v-if="showMobileSearch" class="mobile-search-overlay" @click="closeMobileSearch">
-      <div class="mobile-search-container" @click.stop>
-        <el-input
-          v-model="inputValue"
-          placeholder="请输入搜索内容"
-          size="large"
-          class="mobile-search-input"
-          autofocus
-        />
-        <el-button @click="closeMobileSearch" type="text">取消</el-button>
-      </div>
-    </div>
+    <!-- 移动端搜索组件 -->
+    <SearchBox 
+      v-if="isMobile"
+      :is-mobile="true"
+      :show-mobile-search="showMobileSearch"
+      @close-mobile-search="closeMobileSearch"
+    />
   </el-header>
 </template>
 
@@ -62,28 +52,24 @@
 import { Search, Sunny, Moon, Fold, Expand, EditPen } from '@element-plus/icons-vue'
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import SearchBox from './SearchBox.vue'
 
 const route = useRoute()
 const router = useRouter()
 
-// 定义 emit
 const emit = defineEmits(['toggle-sidebar'])
 
-const inputValue = ref('')
 const active = ref('1')
 const isDark = ref(false)
 const isMobile = ref(false)
 const sidebarVisible = ref(false)
 const showMobileSearch = ref(false)
 
-// 切换侧边栏 - 通过 emit 传递事件给父组件
 const toggleSidebar = () => {
   sidebarVisible.value = !sidebarVisible.value
   emit('toggle-sidebar')
-  console.log('侧边栏切换:', sidebarVisible.value) // 调试用
 }
 
-// 主题切换
 const toggleTheme = () => {
   isDark.value = !isDark.value
 }
@@ -92,7 +78,6 @@ const goToPlayground = () => {
   router.push('/playground')
 }
 
-// 移动端搜索
 const toggleMobileSearch = () => {
   showMobileSearch.value = true
 }
@@ -101,10 +86,8 @@ const closeMobileSearch = () => {
   showMobileSearch.value = false
 }
 
-// 监听窗口宽度，判断是否为手机
 const handleResize = () => {
   isMobile.value = window.innerWidth <= 768
-  // 移动端默认隐藏侧边栏
   if (isMobile.value) {
     sidebarVisible.value = false
   }
@@ -168,13 +151,6 @@ watch(isDark, (val) => {
   gap: 12px;
 }
 
-.search-box {
-  width: 700px;
-  font-size: 15px;
-  margin-top: 6px;
-  margin-right: 20px;
-}
-
 .menu {
   border-bottom: none !important;
   margin-right: 15px;
@@ -207,33 +183,6 @@ watch(isDark, (val) => {
   color: var(--text-color);
 }
 
-/* 移动端搜索覆盖层 */
-.mobile-search-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2000;
-  display: flex;
-  align-items: flex-start;
-  padding-top: 95px;
-}
-
-.mobile-search-container {
-  width: 100%;
-  background: var(--bg-color);
-  padding: 20px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.mobile-search-input {
-  flex: 1;
-}
-
 @media (max-width: 768px) {
   .header {
     padding: 0 20px; 
@@ -250,7 +199,6 @@ watch(isDark, (val) => {
     width: 150px;
   }
 
-  .search-box,
   .nav,
   .theme-toggle {
     display: none !important;

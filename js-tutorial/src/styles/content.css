@@ -353,7 +353,7 @@
   .markdown-content .code-buttons {
     top: 6px;
     left: 6px;
-    gap: 4px; /* 减少按钮间距 */
+    gap: 4px; 
   }
   
   .markdown-content .code-button {
@@ -362,7 +362,9 @@
   }
   
   .markdown-content .code-button svg.icon {
-    width: 14px; /* 稍微减小图标尺寸 */
+    width: 14px; 
     height: 14px;
   }
 }
+
+

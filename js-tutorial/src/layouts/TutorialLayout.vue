@@ -32,20 +32,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Sidebar from '@/components/Sidebar.vue'
 import TutorialContent from '@/components/TutorialContent.vue'
 import Footer from '@/components/Footer.vue'
+import { searchService } from '@/utils/searchService.js'
 
-defineProps({
-  section: String,
-  subsection: String
-})
-
-// 🔧 控制侧边栏显示
-const sidebarVisible = ref(false)
+const route = useRoute()
+const sidebarVisible = ref(true)
 const isMobile = ref(window.innerWidth <= 768)
+
+// 从路由参数获取 section 和 subsection
+const section = computed(() => route.params.section)
+const subsection = computed(() => route.params.subsection)
+
+const currentPath = computed(() => {
+  const { section, subsection } = route.params
+  return section && subsection ? `/tutorial/${section}/${subsection}` : ''
+})
 
 // 切换侧边栏显示状态
 const toggleSidebar = () => {
@@ -68,7 +74,15 @@ const handleResize = () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // 初始化搜索
+  try {
+    await searchService.initializeIndex()
+    console.log('搜索服务初始化成功')
+  } catch (error) {
+    console.error('搜索服务初始化失败:', error)
+  }
+
   window.addEventListener('resize', handleResize)
 })
 
