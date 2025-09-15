@@ -1,6 +1,6 @@
 const mysql = require('mysql2/promise');
 
-// 创建连接池
+// 创建连接池 / Create connection pool
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -12,11 +12,11 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// 测试连接
+// 测试连接 / Test connection
 pool.getConnection()
   .then(conn => {
     console.log('✅ 成功连接到 MySQL 数据库');
-    conn.release(); // 释放连接回连接池
+    conn.release(); 
   })
   .catch(err => {
     console.error('数据库连接失败:', err);

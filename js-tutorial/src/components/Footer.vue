@@ -2,12 +2,14 @@
   <div class="footer">
     <div class="footer-content">
       <div class="center-content">
-        <p>Copyright © {{ currentYear }} wanyuan. All rights reserved.</p>
+        <p>Copyright © {{ currentYear }} WanYuan. All rights reserved.</p>
         <div class="tech-stack">
           <span>Built with</span>
-          <el-tag type="info" size="small">Vue.js</el-tag>
-          <el-tag type="info" size="small">Element Plus</el-tag>
+          <el-tag type="primary" size="small">Vue 3</el-tag>
+          <el-tag type="warning" size="small">Vite</el-tag>
+          <el-tag type="success" size="small">Element Plus</el-tag>
           <el-tag type="info" size="small">Express</el-tag>
+          <el-tag type="danger" size="small">MySQL</el-tag>
         </div>
       </div>
     </div>
@@ -16,8 +18,6 @@
 
 <script setup>
 import { computed } from 'vue'
-
-// 获取当前年份
 const currentYear = computed(() => new Date().getFullYear())
 </script>
 
@@ -26,18 +26,15 @@ const currentYear = computed(() => new Date().getFullYear())
   background-color: var(--bg-color);
   border-top: 1px solid var(--border-color, #e5e7eb);
   margin-top: 40px;
-  margin-left: 220px; /* 与主内容区保持一致的左边距 */
-  transition: background-color 0.3s ease, color 0.3s ease;
+  margin-left: 220px;
   height: 95px;
   display: flex;
   align-items: center;
 }
 
 .footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 40px; /* 与主内容区保持一致的左右内边距 */
   width: 100%;
+  padding: 0 40px;
   display: flex;
   justify-content: center;
 }
@@ -54,8 +51,6 @@ const currentYear = computed(() => new Date().getFullYear())
   font-size: 16px;
   color: var(--text-color);
   opacity: 0.8;
-  font-weight: 500;
-  text-align: center;
 }
 
 .tech-stack {
@@ -68,26 +63,18 @@ const currentYear = computed(() => new Date().getFullYear())
   font-size: 16px;
   color: var(--text-color);
   opacity: 0.8;
-  margin-right: 4px;
 }
 
-.tech-stack .el-tag {
-  margin: 0 2px;
-  font-size: 13px;
-}
-
-/* 响应式设计 */
+/* 移动端适配 / Mobile responsive */
 @media (max-width: 768px) {
   .footer {
-    margin-left: 0; /* 小屏幕下移除左边距 */
-    margin-right: 0; /* 去除右边距 */
-    margin-top: 20px; /* 减少顶部边距 */
+    margin: 20px 0 0 0;
   }
-  
+
   .footer-content {
     padding: 0 20px;
   }
-  
+
   .tech-stack {
     flex-wrap: wrap;
     justify-content: center;

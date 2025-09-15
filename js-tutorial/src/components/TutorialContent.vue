@@ -284,7 +284,7 @@ function runHTMLCode(htmlCode, outputDiv) {
   const iframe = document.createElement('iframe')
   iframe.style.width = '100%'
   iframe.style.height = '200px' 
-  iframe.style.border = '1px solid #ddd'
+  iframe.style.border = '1px solid transparent'
   iframe.style.borderRadius = '4px'
   iframe.style.backgroundColor = 'var(--bg-color)'
   iframe.style.display = 'block' // 确保显示为块级元素
