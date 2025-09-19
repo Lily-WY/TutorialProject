@@ -8,26 +8,19 @@
             <el-button size="small" @click="handleRun" :loading="isLoading">
               <el-icon><VideoPlay /></el-icon> 运行
             </el-button>
-            <el-dropdown>
-              <el-button size="small">
-                <el-icon><Delete /></el-icon> 清空
-                <el-icon class="el-icon--right"><arrow-down /></el-icon>
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click="handleReset">重置为默认代码</el-dropdown-item>
-                  <el-dropdown-item @click="handleClear">完全清空</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
+            <el-button size="small" @click="handleFormat">
+              <el-icon><Document /></el-icon> 格式化
+            </el-button>
+            <el-button size="small" @click="handleClear">
+              <el-icon><Delete /></el-icon> 清空
+            </el-button>
           </div>
         </div>
         <MonacoEditor
-          ref="monacoEditor"
           v-model:value="code"
           class="editor"
           :options="editorOptions"
-          @mounted="handleEditorMounted"
+          @mount="handleMount"    
           @change="handleChange"
         />
       </div>
@@ -45,12 +38,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import MonacoEditor from '@guolao/vue-monaco-editor' 
-import { VideoPlay, Delete, ArrowDown } from '@element-plus/icons-vue'
+import { ref, onMounted } from 'vue'
+import MonacoEditor from '@guolao/vue-monaco-editor'
+import { VideoPlay, Delete, Document } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
-const monacoEditor = ref(null)
+// Monaco Editor 实例
+const editor = ref(null)
+
 const isLoading = ref(false)
 const isError = ref(false)
 const outputLines = ref([])
@@ -60,32 +55,30 @@ const code = ref(defaultCode)
 const editorOptions = {
   language: 'javascript',
   theme: 'vs-dark',
+  automaticLayout: true,
+  formatOnType: true,
+  formatOnPaste: true,
   fontSize: 17,
   minimap: { enabled: false },
   scrollBeyondLastLine: false,
-  automaticLayout: true,
   lineNumbers: 'on',
   tabSize: 2,
   wordWrap: 'on',
-  formatOnPaste: true,
-  formatOnType: true,
   readOnly: false
 }
 
-const handleEditorMounted = (editor) => {
-  monacoEditor.value = editor
+// 获取编辑器实例
+const handleMount = (editorInstance) => {
+  editor.value = editorInstance
+  console.log('Monaco Editor 已挂载:', editorInstance)
 }
 
 const handleChange = (value) => {
   code.value = value
 }
 
+// 运行代码
 const handleRun = async () => {
-  if (!monacoEditor.value) {
-    ElMessage.error('编辑器未就绪')
-    return
-  }
-
   try {
     isLoading.value = true
     isError.value = false
@@ -115,28 +108,24 @@ const handleRun = async () => {
   }
 }
 
-const handleReset = () => {
-  if (!monacoEditor.value) {
+// 格式化代码
+const handleFormat = () => {
+  if (!editor.value) {
     ElMessage.error('编辑器未就绪')
     return
   }
 
   try {
-    code.value = defaultCode
-    outputLines.value = []
-    isError.value = false
-    ElMessage.success('已重置代码和输出')
+    editor.value.getAction('editor.action.formatDocument').run()
+    ElMessage.success('代码格式化成功')
   } catch (err) {
-    ElMessage.error('重置失败：' + err.message)
+    console.error('格式化错误:', err)
+    ElMessage.error('格式化失败：' + err.message)
   }
 }
 
+// 清空代码
 const handleClear = () => {
-  if (!monacoEditor.value) {
-    ElMessage.error('编辑器未就绪')
-    return
-  }
-
   try {
     code.value = ''
     outputLines.value = []
@@ -147,20 +136,18 @@ const handleClear = () => {
   }
 }
 
+// 从 localStorage 加载代码
 onMounted(() => {
   const savedCode = localStorage.getItem('playground-code')
   if (savedCode) {
-    // 设置到编辑器中
     code.value = savedCode
-    // 可选：清除 localStorage 中的代码
     localStorage.removeItem('playground-code')
   }
 })
-
-onBeforeUnmount(() => {
-  // Cleanup if needed
-})
 </script>
+
+
+
 
 <style scoped>
 .playground {
