@@ -1,74 +1,114 @@
 <template>
-  <div class="search-container">
-    <!-- 桌面端搜索框 -->
-    <div v-if="!isMobile" class="desktop-search">
-      <el-input
-        v-model="searchQuery"
-        placeholder="请输入搜索内容"
-        :suffix-icon="Search"
-        size="large"
-        class="search-box"
-        @input="onInput"
-        @focus="showDropdown = true"
-        @keyup.enter="selectFirstResult"
-        @keydown.down="navigateDown"
-        @keydown.up="navigateUp"
-        @keydown.esc="hideDropdown"
-      />
-      
-      <!-- 搜索结果下拉 -->
-      <div v-if="showDropdown && (searchResults.length > 0 || searchQuery)" class="search-dropdown">
-        <div v-if="searchResults.length === 0 && searchQuery" class="no-results">
-          未找到 "{{ searchQuery }}" 相关内容
+  <div class="search-container" :class="{ 'mobile': isMobile }">
+    <!-- 移动端搜索遮罩 -->
+    <div 
+      v-if="isMobile && showMobileSearch" 
+      class="mobile-search-overlay"
+      @click="closeMobileSearch"
+    >
+      <div class="mobile-search-content" @click.stop>
+        <div class="mobile-search-header">
+          <el-input
+            ref="searchInputRef"
+            v-model="searchQuery"
+            placeholder="搜索教程内容..."
+            size="large"
+            @keyup.enter="handleSearch"
+            @input="handleInput"
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+          <el-button @click="closeMobileSearch" text>
+            <el-icon><Close /></el-icon>
+          </el-button>
         </div>
-        <div 
-          v-for="(result, index) in searchResults" 
-          :key="result.id"
-          class="result-item"
-          :class="{ active: index === activeIndex }"
-          @click="selectResult(result)"
-          @mouseenter="activeIndex = index"
-        >
-          <div class="result-content">
-            <div class="result-type">{{ result.type === 'category' ? '分类' : '文章' }}</div>
-            <div class="result-title" v-html="highlightText(result.title, searchQuery)"></div>
-            <div class="result-breadcrumb">{{ result.breadcrumb }}</div>
+        
+        <!-- 移动端搜索结果 -->
+        <div class="search-results-container">
+          <div class="search-results">
+            <!-- 加载状态 -->
+            <div v-if="isLoading" class="loading-state">
+              <el-icon class="is-loading"><Loading /></el-icon>
+              <span>搜索中...</span>
+            </div>
+            
+            <!-- 无结果 -->
+            <div v-else-if="searchResults.length === 0 && searchQuery.trim()" class="no-results">
+              <el-icon><DocumentRemove /></el-icon>
+              <span>未找到 "{{ searchQuery }}" 相关内容</span>
+            </div>
+            
+            <!-- 搜索结果列表 -->
+            <div v-else class="results-list">
+              <div 
+                v-for="result in searchResults" 
+                :key="result.id"
+                class="result-item"
+                @click="handleSelectResult(result)"
+              >
+                <div class="result-header">
+                  <div class="result-title-wrapper">
+                    <h4 class="result-title" v-html="highlightText(result.title, searchQuery)"></h4>
+                  </div>
+                  <span class="result-category-text">{{ result.sectionTitle }}</span>
+                </div>
+                <div class="result-snippet" v-html="highlightText(result.snippet, searchQuery)"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 移动端搜索覆盖层 -->
-    <div v-if="showMobileSearch" class="mobile-search-overlay" @click="closeMobileSearch">
-      <div class="mobile-search-container" @click.stop>
-        <div class="mobile-header">
-          <el-input
-            v-model="searchQuery"
-            placeholder="请输入搜索内容"
-            size="large"
-            class="mobile-search-input"
-            autofocus
-            @input="onInput"
-            @keyup.enter="selectFirstResult"
-          />
-          <el-button @click="closeMobileSearch" type="text">取消</el-button>
-        </div>
-        
-        <!-- 移动端搜索结果 -->
-        <div v-if="searchResults.length > 0 || searchQuery" class="mobile-results">
-          <div v-if="searchResults.length === 0 && searchQuery" class="no-results">
-            未找到 "{{ searchQuery }}" 相关内容
+    <!-- 桌面端搜索 -->
+    <div v-else class="desktop-search">
+      <el-input
+        ref="searchInputRef"
+        v-model="searchQuery"
+        placeholder="搜索教程内容..."
+        style="width: 700px; height: 40px;"
+        @focus="showResults = true"
+        @blur="handleBlur"
+        @keyup.enter="handleSearch"
+        @input="handleInput"
+      >
+        <template #prefix>
+          <el-icon><Search /></el-icon>
+        </template>
+      </el-input>
+      
+      <!-- 桌面端搜索结果下拉框 -->
+      <div v-if="showResults && (searchResults.length > 0 || isLoading || showEmptyState)" class="search-dropdown">
+        <div class="search-results">
+          <!-- 加载状态 -->
+          <div v-if="isLoading" class="loading-state">
+            <el-icon class="is-loading"><Loading /></el-icon>
+            <span>搜索中...</span>
           </div>
-          <div 
-            v-for="result in searchResults" 
-            :key="result.id"
-            class="result-item"
-            @click="selectResult(result)"
-          >
-            <div class="result-content">
-              <div class="result-type">{{ result.type === 'category' ? '分类' : '文章' }}</div>
-              <div class="result-title" v-html="highlightText(result.title, searchQuery)"></div>
-              <div class="result-breadcrumb">{{ result.breadcrumb }}</div>
+          
+          <!-- 无结果 -->
+          <div v-else-if="searchResults.length === 0 && searchQuery.trim()" class="no-results">
+            <el-icon><DocumentRemove /></el-icon>
+            <span>未找到 "{{ searchQuery }}" 相关内容</span>
+          </div>
+          
+          <!-- 搜索结果列表 -->
+          <div v-else class="results-list">
+            <div 
+              v-for="result in searchResults" 
+              :key="result.id"
+              class="result-item"
+              @click="handleSelectResult(result)"
+            >
+              <div class="result-header">
+                <div class="result-title-wrapper">
+                  <h4 class="result-title" v-html="highlightText(result.title, searchQuery)"></h4>
+                </div>
+                <span class="result-category-text">{{ result.sectionTitle }}</span>
+              </div>
+              <div class="result-snippet" v-html="highlightText(result.snippet, searchQuery)"></div>
             </div>
           </div>
         </div>
@@ -78,118 +118,134 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { Search } from '@element-plus/icons-vue'
+import { ref, watch, nextTick, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { searchService } from '@/utils/searchService.js'
+import { Search, Close, Loading, DocumentRemove } from '@element-plus/icons-vue'
 
 const props = defineProps({
-  isMobile: {
-    type: Boolean,
-    default: false
-  },
-  showMobileSearch: {
-    type: Boolean,
-    default: false
-  }
+  isMobile: Boolean,
+  showMobileSearch: Boolean
 })
 
 const emit = defineEmits(['close-mobile-search'])
 
 const router = useRouter()
+const searchInputRef = ref(null)
 const searchQuery = ref('')
 const searchResults = ref([])
-const showDropdown = ref(false)
-const activeIndex = ref(-1)
+const isLoading = ref(false)
+const showResults = ref(false)
 
-// 搜索功能
-const onInput = () => {
-  if (searchQuery.value.trim()) {
-    searchResults.value = searchService.search(searchQuery.value, 8)
-    showDropdown.value = true
-    activeIndex.value = -1
-    console.log('搜索结果:', searchResults.value) // 调试用
+const showEmptyState = computed(() => {
+  return searchQuery.value.trim() && !isLoading.value && searchResults.value.length === 0
+})
+
+// 防抖函数
+const debounce = (func, wait) => {
+  let timeout
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout)
+      func(...args)
+    }
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+  }
+}
+
+// 搜索函数
+const searchTutorials = async (query, limit = 8) => {
+  try {
+    const response = await fetch(`/api/search?query=${encodeURIComponent(query)}&limit=${limit}`)
+    if (!response.ok) throw new Error('搜索失败')
+    return await response.json()
+  } catch (error) {
+    console.error('搜索失败:', error)
+    throw error
+  }
+}
+
+// 防抖搜索
+const debouncedSearch = debounce(async (query) => {
+  if (!query.trim()) {
+    searchResults.value = []
+    showResults.value = false
+    return
+  }
+  
+  isLoading.value = true
+  
+  try {
+    const results = await searchTutorials(query)
+    console.log('搜索结果:', results) // 调试用
+    searchResults.value = results.map(item => ({
+      ...item,
+      url: `/tutorial${item.path}` // 添加路由路径
+    }))
+    showResults.value = true
+  } catch (error) {
+    console.error('搜索失败:', error)
+    searchResults.value = []
+  } finally {
+    isLoading.value = false
+  }
+}, 300)
+
+// 高亮搜索关键词
+const highlightText = (text, query) => {
+  if (!query || !text) return text
+  
+  const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi')
+  return text.replace(regex, '<mark>$1</mark>')
+}
+
+// 转义正则表达式特殊字符
+const escapeRegExp = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const handleInput = (value) => {
+  if (value.trim()) {
+    debouncedSearch(value)
   } else {
     searchResults.value = []
-    showDropdown.value = false
+    showResults.value = false
   }
 }
 
-// 键盘导航
-const navigateDown = () => {
-  if (searchResults.value.length > 0) {
-    activeIndex.value = Math.min(activeIndex.value + 1, searchResults.value.length - 1)
+const handleSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.push(`/search?q=${encodeURIComponent(searchQuery.value)}`)
+    closeMobileSearch()
   }
 }
 
-const navigateUp = () => {
-  if (searchResults.value.length > 0) {
-    activeIndex.value = Math.max(activeIndex.value - 1, -1)
-  }
+const handleSelectResult = (result) => {
+  router.push(result.url)
+  closeMobileSearch()
+  showResults.value = false
+  searchQuery.value = ''
 }
 
-// 选择第一个结果
-const selectFirstResult = () => {
-  if (searchResults.value.length > 0) {
-    const result = activeIndex.value >= 0 ? searchResults.value[activeIndex.value] : searchResults.value[0]
-    selectResult(result)
-  }
+const handleBlur = () => {
+  setTimeout(() => {
+    showResults.value = false
+  }, 200)
 }
 
-// 高亮关键词
-const highlightText = (text, keyword) => {
-  if (!keyword) return text
-  
-  const regex = new RegExp(`(${keyword})`, 'gi')
-  return text.replace(regex, '<span class="highlight">$1</span>')
-}
-
-// 选择搜索结果
-const selectResult = (result) => {
-  console.log('点击搜索结果:', result) // 调试用
-  console.log('跳转路径:', result.path) // 调试用
-  router.push(result.path)
-  clearSearch()
+const closeMobileSearch = () => {
   emit('close-mobile-search')
-}
-
-// 清空搜索
-const clearSearch = () => {
   searchQuery.value = ''
   searchResults.value = []
-  showDropdown.value = false
-  activeIndex.value = -1
+  showResults.value = false
 }
 
-// 隐藏下拉框
-const hideDropdown = () => {
-  showDropdown.value = false
-  activeIndex.value = -1
-}
-
-// 关闭移动端搜索
-const closeMobileSearch = () => {
-  clearSearch()
-  emit('close-mobile-search')
-}
-
-// 点击外部关闭
-const handleClickOutside = (event) => {
-  if (!event.target.closest('.search-container')) {
-    hideDropdown()
+watch(() => props.showMobileSearch, (show) => {
+  if (show) {
+    nextTick(() => {
+      searchInputRef.value?.focus()
+    })
   }
-}
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
-
-defineExpose({
-  clearSearch
 })
 </script>
 
@@ -198,91 +254,25 @@ defineExpose({
   position: relative;
 }
 
-/* 桌面端搜索框 - 使用你原有的样式 */
 .desktop-search {
   position: relative;
 }
 
-.search-box {
-  width: 700px;
-  font-size: 15px;
-  margin-top: 6px;
-  margin-right: 20px;
-}
-
-/* 搜索下拉框 */
 .search-dropdown {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
   background: var(--bg-color);
-  border: 1px solid var(--border-color, #dcdfe6);
-  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-height: 300px;
+  z-index: 1000;
+  max-height: 400px;
   overflow-y: auto;
-  z-index: 1001;
   margin-top: 4px;
 }
 
-.result-item {
-  padding: 12px 16px;
-  cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.2s;
-}
-
-.result-item:hover,
-.result-item.active {
-  background-color: #f8f9ff;
-}
-
-.result-item:last-child {
-  border-bottom: none;
-}
-
-.result-content {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.result-type {
-  font-size: 11px;
-  color: #666;
-  background: #f0f0f0;
-  padding: 2px 6px;
-  border-radius: 10px;
-  width: fit-content;
-}
-
-.result-title {
-  font-weight: 500;
-  color: var(--text-color, #333);
-  font-size: 14px;
-}
-
-.result-title :deep(.highlight) {
-  background: #fffbf0;
-  color: #d46b08;
-  padding: 1px 2px;
-  border-radius: 2px;
-}
-
-.result-breadcrumb {
-  font-size: 12px;
-  color: #999;
-}
-
-.no-results {
-  padding: 20px;
-  text-align: center;
-  color: #999;
-  font-size: 14px;
-}
-
-/* 移动端样式 - 保持你原有的样式 */
 .mobile-search-overlay {
   position: fixed;
   top: 0;
@@ -293,66 +283,126 @@ defineExpose({
   z-index: 2000;
   display: flex;
   align-items: flex-start;
-  padding-top: 95px;
+  padding-top: 60px;
 }
 
-.mobile-search-container {
-  width: 100%;
+.mobile-search-content {
   background: var(--bg-color);
-  padding: 20px;
+  width: 100%;
+  max-height: 80vh;
+  border-radius: 12px 12px 0 0;
   display: flex;
   flex-direction: column;
-  gap: 15px;
 }
 
-.mobile-header {
+.mobile-search-header {
+  padding: 20px;
   display: flex;
   gap: 10px;
   align-items: center;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.mobile-search-input {
+.mobile-search-header .el-input {
   flex: 1;
 }
 
-.mobile-results {
-  max-height: 400px;
+.search-results-container {
+  flex: 1;
   overflow-y: auto;
-  border: 1px solid var(--border-color, #dcdfe6);
+  padding: 10px 0;
+}
+
+/* 搜索结果样式 - 恢复之前的样式 */
+.search-results {
+  min-height: 60px;
+}
+
+.loading-state, .no-results {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  color: var(--text-color-secondary);
+  font-size: 14px;
+}
+
+.results-list {
+  padding: 8px 0;
+}
+
+.result-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color-light);
+  transition: background-color 0.2s;
+}
+
+.result-item:hover {
+  background-color: var(--hover-bg-color, rgba(0, 0, 0, 0.05));
+}
+
+.result-item:last-child {
+  border-bottom: none;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.result-title-wrapper {
+  flex: 1;
+}
+
+.result-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;  /* 改为白色文字 */
+  margin: 0;
+  line-height: 1.3;
+  background-color: var(--primary-color, #8addff);  /* 改为主题蓝色 */
+  padding: 6px 8px;
   border-radius: 6px;
-  background: var(--bg-color);
+  display: inline-block;
+}
+
+.result-category-text {
+  color: var(--text-color-secondary, #666);
+  font-size: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.result-snippet {
+  font-size: 14px;
+  color: var(--text-color-secondary);
+  line-height: 1.5;
+  margin-bottom: 0;
 }
 
 /* 暗色模式适配 */
-.dark .search-dropdown,
-.dark .mobile-results {
-  border-color: #30363d;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  background-color: #0d1117;
+:root.dark .result-title {
+  background-color: var(--primary-color, #409eff);  /* 暗色模式也使用主题蓝色 */
+  color: white;
 }
 
-.dark .result-item:hover,
-.dark .result-item.active {
-  background-color: #21262d;
+:deep(mark) {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 600;
 }
 
-.dark .result-type {
-  background: #30363d;
-  color: #8b949e;
-}
-
-.dark .result-title :deep(.highlight) {
-  background: #3d2914;
-  color: #f1c40f;
-}
-
-.dark .result-title {
-  color: #f0f6fc;
-}
-
-@media (max-width: 768px) {
-  .desktop-search {
-    display: none;
-  }
+/* 暗色模式下的高亮样式 */
+:root.dark :deep(mark) {
+  background-color: #664d03;
+  color: #fff3cd;
 }
 </style>

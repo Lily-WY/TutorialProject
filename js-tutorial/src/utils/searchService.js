@@ -90,4 +90,70 @@ export class SearchService {
   }
 }
 
-export const searchService = new SearchService()
+export const searchService = {
+  // 调用后端 API 进行搜索
+  async search(query, limit = 8) {
+    try {
+      if (!query || !query.trim()) {
+        return []
+      }
+
+      const response = await fetch(`/api/search?query=${encodeURIComponent(query.trim())}&limit=${limit}`)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const results = await response.json()
+      
+      // 将后端数据转换为前端需要的格式
+      return results.map(item => ({
+        id: item.id,
+        title: this.extractTitle(item.path, item.content),
+        path: `/tutorial${item.path}`, // 添加 /tutorial 前缀用于路由
+        type: 'article',
+        breadcrumb: this.getBreadcrumb(item.path),
+        content: item.content,
+        relevance: item.relevance_score
+      }))
+
+    } catch (error) {
+      console.error('搜索失败:', error)
+      return []
+    }
+  },
+
+  // 从内容中提取标题
+  extractTitle(path, content) {
+    // 尝试从 markdown 内容中提取第一个标题
+    const titleMatch = content.match(/^#\s+(.+)$/m)
+    if (titleMatch) {
+      return titleMatch[1].replace(/[#✨🚀📌💡🔍✅🧠🧩🖊️📦📍🧪]/g, '').trim()
+    }
+    
+    // 如果没有找到标题，使用路径生成
+    return path.split('/').pop().replace(/-/g, ' ')
+  },
+
+  // 生成面包屑导航
+  getBreadcrumb(path) {
+    const parts = path.split('/')
+    const categoryMap = {
+      'entry': '入门介绍',
+      'syntax': '基础语法', 
+      'function': '函数',
+      'object': '对象',
+      'async': '异步编程',
+      'dom': 'DOM操作',
+      'projects': '项目实战'
+    }
+    
+    if (parts.length >= 2) {
+      const category = categoryMap[parts[1]] || parts[1]
+      const filename = parts[parts.length - 1].replace(/-/g, ' ')
+      return `${category} > ${filename}`
+    }
+    
+    return path.replace(/\//g, ' > ').replace(/-/g, ' ')
+  }
+}
