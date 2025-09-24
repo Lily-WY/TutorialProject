@@ -75,14 +75,6 @@ const handleResize = () => {
 }
 
 onMounted(async () => {
-  // 初始化搜索
-  try {
-    await searchService.initializeIndex()
-    console.log('搜索服务初始化成功')
-  } catch (error) {
-    console.error('搜索服务初始化失败:', error)
-  }
-
   window.addEventListener('resize', handleResize)
 })
 
