@@ -21,6 +21,7 @@
         </div>
         <MonacoEditor
           v-model:value="code"
+          language="javascript"
           class="editor"
           :options="editorOptions"
           @mount="handleMount"    
