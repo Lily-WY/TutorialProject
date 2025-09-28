@@ -20,6 +20,7 @@
 
       <!-- 桌面端内容 -->
       <template v-else>
+        <!-- 桌面端搜索框 - 700px 宽度 -->
         <SearchBox :is-mobile="false" />
         
         <div class="nav">
@@ -38,7 +39,7 @@
       </template>
     </div>
     
-    <!-- 移动端搜索组件 -->
+    <!-- 移动端搜索组件 - 只在移动端且点击搜索图标时显示 -->
     <SearchBox 
       v-if="isMobile"
       :is-mobile="true"
@@ -57,6 +58,7 @@ import SearchBox from './SearchBox.vue'
 const route = useRoute()
 const router = useRouter()
 
+// 定义 emit
 const emit = defineEmits(['toggle-sidebar'])
 
 const active = ref('1')
@@ -65,11 +67,18 @@ const isMobile = ref(false)
 const sidebarVisible = ref(false)
 const showMobileSearch = ref(false)
 
+// 切换侧边栏 - 通过 emit 传递事件给父组件
 const toggleSidebar = () => {
   sidebarVisible.value = !sidebarVisible.value
+  // 发送自定义事件通知侧边栏切换状态
+  document.dispatchEvent(new CustomEvent('toggle-sidebar', { 
+    detail: { visible: sidebarVisible.value } 
+  }))
   emit('toggle-sidebar')
+  console.log('侧边栏切换:', sidebarVisible.value) // 调试用
 }
 
+// 主题切换
 const toggleTheme = () => {
   isDark.value = !isDark.value
 }
@@ -78,6 +87,7 @@ const goToPlayground = () => {
   router.push('/playground')
 }
 
+// 移动端搜索
 const toggleMobileSearch = () => {
   showMobileSearch.value = true
 }
@@ -86,6 +96,7 @@ const closeMobileSearch = () => {
   showMobileSearch.value = false
 }
 
+// 监听窗口宽度，判断是否为手机
 const handleResize = () => {
   isMobile.value = window.innerWidth <= 768
   if (isMobile.value) {
@@ -136,6 +147,7 @@ watch(isDark, (val) => {
 .logo {
   height: 250px;
   width: 250px;
+  margin-right: 10px;
   object-fit: contain;
 }
 
@@ -210,15 +222,20 @@ watch(isDark, (val) => {
   }
 
   .menu-toggle {
+    cursor: pointer;
     margin-left: -10px;
     font-size: 25px;
+    margin-left: -20px;
     color: #545454;
   }
 
   .icon-group {
+    display: flex;
+    align-items: end;
+    gap: 30px;
+    margin-right: -20px;
     margin-right: -10px;
     font-size: 23px;
-    gap: 30px;
   }
 }
 </style>
