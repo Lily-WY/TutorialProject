@@ -101,6 +101,11 @@ const handleResize = () => {
   isMobile.value = window.innerWidth <= 768
   if (isMobile.value) {
     sidebarVisible.value = false
+    // 发送关闭事件
+    document.dispatchEvent(new CustomEvent('toggle-sidebar', { 
+      detail: { visible: false } 
+    }))
+    emit('toggle-sidebar')
   }
 }
 

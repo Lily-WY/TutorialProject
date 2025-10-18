@@ -1,27 +1,31 @@
 <template>
-  <el-menu :default-active="activePath" 
-           :default-openeds="defaultOpeneds"
-           class="el-menu-vertical-demo"
-           active-text-color="#409EFF" 
-           router 
-           unique-opened>
-    <template v-for="section in menu" :key="section.id">
-      <!-- 每个一级目录 -->
-      <el-sub-menu :index="`/tutorial/${section.id}`">
-        <!-- 一级目录的标题插槽 -->
-        <template #title>
-          {{ section.title }}
-        </template>
+  <nav class="sidebar">
+    <el-menu
+      :default-active="activePath"
+      :default-openeds="defaultOpeneds"
+      class="el-menu-vertical-demo"
+      active-text-color="#409EFF"
+      router
+      unique-opened
+    >
+      <template v-for="section in menu" :key="section.id">
+        <el-sub-menu :index="`/tutorial/${section.id}`">
+          <template #title>
+            {{ section.title }}
+          </template>
 
-        <!-- 二级目录列表 -->
-        <el-menu-item v-for="item in section.children" :key="item.path" :index="`/tutorial/${section.id}/${item.path}`">
-          {{ item.title }}
-        </el-menu-item>
-      </el-sub-menu>
-    </template>
-  </el-menu>
+          <el-menu-item
+            v-for="item in section.children"
+            :key="item.path"
+            :index="`/tutorial/${section.id}/${item.path}`"
+          >
+            {{ item.title }}
+          </el-menu-item>
+        </el-sub-menu>
+      </template>
+    </el-menu>
+  </nav>
 </template>
-
 
 <script setup>
 import { computed } from 'vue'
@@ -30,23 +34,43 @@ import menu from '@/data/menu.json'
 import '@/styles/index.css'
 
 const route = useRoute()
-const activePath = computed(() => route.fullPath)
 
-// 设置默认展开的菜单项（第一个菜单）
+/**
+ * 当前激活的路径，用于菜单高亮
+ * Current active path for menu highlighting
+ */
+const activePath = computed(() => route.path)
+
+/**
+ * 默认展开的菜单项
+ * 兼容 menu 为数组或对象两种格式，自动展开第一个一级目录
+ * 
+ * Default opened menu items
+ * Compatible with both array and object menu formats, auto-opens first top-level section
+ */
 const defaultOpeneds = computed(() => {
-  const firstSection = Object.keys(menu)[0]
-  return [`/tutorial/${firstSection}`]
+  if (!menu) return []
+  
+  if (Array.isArray(menu)) {
+    if (menu.length === 0) return []
+    return [`/tutorial/${menu[0].id}`]
+  }
+  
+  const keys = Object.keys(menu)
+  if (keys.length === 0) return []
+  return [`/tutorial/${keys[0]}`]
 })
 </script>
 
-
 <style scoped>
-.el-menu {
-  border-right: none;
-  margin-top: 0;
-  margin-left: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  color: var(--text-color);
+/**
+ * 侧边栏容器
+ * 使用高优先级选择器覆盖 Element Plus 默认样式，避免使用 !important
+ * 
+ * Sidebar container
+ * Uses high-specificity selectors to override Element Plus defaults without !important
+ */
+.sidebar {
   position: fixed;
   top: 128px;
   left: 0;
@@ -55,143 +79,166 @@ const defaultOpeneds = computed(() => {
   overflow-y: auto;
   z-index: 1000;
   background: var(--bg-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  color: var(--text-color);
+  margin-top: 0;
+  margin-left: 20px;
+  font-family: "Times New Roman", Times, serif;
 }
 
-/* 亮色模式滚动条 */
-.el-menu::-webkit-scrollbar {
-  width: 6px;
-}
-
-.el-menu::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.el-menu::-webkit-scrollbar-thumb {
-  background: #e3e3e3;
-  border-radius: 3px;
-}
-
-.el-menu::-webkit-scrollbar-thumb:hover {
-  background: #d0d0d0;
-}
-
-/* 黑夜模式滚动条 - 使用.dark类选择器 */
-.dark .el-menu::-webkit-scrollbar-track {
-  background: #2d2d2d;
-}
-
-.dark .el-menu::-webkit-scrollbar-thumb {
-  background: #4a4a4a;
-}
-
-.dark .el-menu::-webkit-scrollbar-thumb:hover {
-  background: #5a5a5a;
-}
-
-/* Firefox 滚动条样式 */
-.el-menu {
+/**
+ * 菜单基础样式
+ * Basic menu styles
+ */
+.sidebar > .el-menu {
+  border-right: none;
+  box-shadow: none;
+  color: inherit;
+  background: transparent;
+  width: 100%;
+  height: 100%;
+  padding: 0;
   scrollbar-width: thin;
   scrollbar-color: #d0d0d0 #f1f1f1;
 }
 
-/* Firefox 黑夜模式 */
-.dark .el-menu {
+/**
+ * 滚动条样式 - WebKit 浏览器（Chrome, Safari, Edge）
+ * Scrollbar styles for WebKit browsers
+ */
+.sidebar .el-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar .el-menu::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.sidebar .el-menu::-webkit-scrollbar-thumb {
+  background: #e3e3e3;
+  border-radius: 3px;
+}
+
+.sidebar .el-menu::-webkit-scrollbar-thumb:hover {
+  background: #d0d0d0;
+}
+
+/**
+ * 暗色模式滚动条
+ * Dark mode scrollbar
+ */
+:root.dark .sidebar .el-menu::-webkit-scrollbar-track {
+  background: #2d2d2d;
+}
+
+:root.dark .sidebar .el-menu::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+}
+
+:root.dark .sidebar .el-menu::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
+}
+
+:root.dark .sidebar > .el-menu {
   scrollbar-color: #4a4a4a #2d2d2d;
 }
 
-/* 一级菜单标题字体 */
-::v-deep(.el-sub-menu__title) {
+/**
+ * 一级菜单标题样式
+ * Top-level menu title styles
+ */
+.sidebar :deep(.el-sub-menu__title) {
   font-size: 18px;
   color: var(--text-color);
-  font-family: inherit;
-  padding: 0 20px !important;
-  height: 56px !important;
-  line-height: 56px !important;
+  padding-left: 20px;
+  padding-right: 20px;
+  height: 56px;
+  line-height: 56px;
 }
 
-/* 一级菜单标题悬停背景 */
-::v-deep(.el-sub-menu__title:hover) {
+.sidebar :deep(.el-sub-menu__title:hover) {
   background-color: var(--hover-bg);
 }
 
-/* 子菜单项样式 */
-::v-deep(.el-menu-item) {
+/**
+ * 二级菜单项样式
+ * Second-level menu item styles
+ */
+.sidebar :deep(.el-menu-item) {
   font-size: 17px;
   color: var(--text-color);
-  font-family: inherit;
-  padding: 0 20px 0 40px !important;
-  height: 50px !important;
-  line-height: 50px !important;
+  padding-left: 40px;
+  padding-right: 20px;
+  height: 50px;
+  line-height: 50px;
 }
 
-/* 子菜单项悬停背景 */
-::v-deep(.el-menu-item:hover) {
+.sidebar :deep(.el-menu-item:hover),
+.sidebar :deep(.el-menu-item.is-active) {
   background-color: var(--hover-bg);
 }
 
-::v-deep(.el-menu-item.is-active) {
-  background-color: var(--hover-bg) !important;
-}
-
-.el-menu,
-.el-sub-menu,
-.el-menu-item {
-  font-family: "Times New Roman", Times, serif;
-}
-
-/* 移动端样式 - 只修改移动端 */
+/**
+ * 平板及手机端适配（≤768px）
+ * 改为静态布局，增大触控区域以提升移动端体验
+ * 
+ * Tablet and mobile adaptation (≤768px)
+ * Changes to static layout with larger touch targets for better mobile UX
+ */
 @media (max-width: 768px) {
-  .el-menu {
-    position: static; /* 移动端改为静态定位 */
+  .sidebar {
+    position: static;
     margin-top: 20px;
     margin-left: 0;
     margin-right: 0;
-    width: 100% !important;
+    width: 100%;
     height: auto;
     min-height: 50vh;
     box-shadow: none;
     padding: 0 15px;
-    top: auto;
-    left: auto;
-    z-index: auto;
   }
-  
-  /* 移动端一级菜单标题 - 放大字体 */
-  ::v-deep(.el-sub-menu__title) {
-    font-size: 22px !important; /* 从18px增加到22px */
-    height: 60px !important; /* 增加高度 */
-    line-height: 60px !important;
-    padding: 0 25px !important; /* 增加左右内边距 */
+
+  .sidebar :deep(.el-sub-menu__title) {
+    font-size: 18px;
+    height: 60px;
+    line-height: 60px;
+    padding-left: 25px;
+    padding-right: 25px;
   }
-  
-  /* 移动端子菜单项 - 放大字体 */
-  ::v-deep(.el-menu-item) {
-    font-size: 20px !important; /* 从17px增加到20px */
-    height: 55px !important; /* 增加高度 */
-    line-height: 55px !important;
-    padding: 0 25px 0 45px !important; /* 增加内边距 */
+
+  .sidebar :deep(.el-menu-item) {
+    font-size: 17px;
+    height: 55px;
+    line-height: 55px;
+    padding-left: 45px;
+    padding-right: 25px;
   }
 }
 
-/* 更小屏幕的字体调整 */
+/**
+ * 小屏手机适配（≤480px）
+ * Small mobile adaptation (≤480px)
+ */
 @media (max-width: 480px) {
-  .el-menu {
+  .sidebar {
     padding: 0 10px;
   }
-  
-  ::v-deep(.el-sub-menu__title) {
-    font-size: 20px !important;
-    height: 55px !important;
-    line-height: 55px !important;
-    padding: 0 20px !important;
+
+  .sidebar :deep(.el-sub-menu__title) {
+    font-size: 20px;
+    height: 55px;
+    line-height: 55px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
-  
-  ::v-deep(.el-menu-item) {
-    font-size: 18px !important;
-    height: 50px !important;
-    line-height: 50px !important;
-    padding: 0 20px 0 40px !important;
+
+  .sidebar :deep(.el-menu-item) {
+    font-size: 18px;
+    height: 50px;
+    line-height: 50px;
+    padding-left: 40px;
+    padding-right: 20px;
   }
 }
 </style>
