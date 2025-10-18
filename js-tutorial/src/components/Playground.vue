@@ -1,7 +1,6 @@
 <template>
   <div class="playground">
-    <!-- 格式化组件（隐藏的） -->
-    <CodeFormatter ref="formatter" />
+    <!-- 使用 Monaco 内置格式化，不再使用自定义 CodeFormatter -->
     
     <div class="editor-container">
       <div class="code-section">
@@ -44,14 +43,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import MonacoEditor from '@guolao/vue-monaco-editor'
-import CodeFormatter from './CodeFormatter.vue'
 import { VideoPlay, Delete, Document } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 // Monaco Editor 实例
 const editor = ref(null)
-// 格式化组件实例
-const formatter = ref(null)
 
 const isLoading = ref(false)
 const isError = ref(false)
@@ -63,8 +59,8 @@ const editorOptions = {
   language: 'javascript',
   theme: 'vs-dark',
   automaticLayout: true,
-  formatOnType: false, // 关闭自动格式化
-  formatOnPaste: false, // 关闭粘贴时格式化
+  formatOnType: true, 
+  formatOnPaste: true, 
   fontSize: 17,
   minimap: { enabled: false },
   scrollBeyondLastLine: false,
@@ -115,38 +111,27 @@ const handleRun = async () => {
   }
 }
 
-// 使用格式化组件格式化代码
+// 使用 Monaco 编辑器自带的格式化功能
 const handleFormat = async () => {
-  if (!formatter.value) {
-    ElMessage.error('格式化组件未就绪')
+  if (!editor.value) {
+    ElMessage.error('编辑器尚未就绪')
     return
   }
 
   try {
-    const beforeFormat = code.value
-    
-    // 先验证语法
-    const validation = formatter.value.validateSyntax(beforeFormat)
-    if (!validation.valid) {
-      ElMessage.warning(`代码语法有误，仍将尝试格式化: ${validation.error}`)
-    }
-    
-    // 使用格式化组件格式化代码
-    const formatted = formatter.value.formatJavaScript(beforeFormat, {
-      indentSize: 2,
-      semicolon: true,
-      singleQuote: true,
-      bracketSpacing: true
-    })
-    
-    if (beforeFormat.trim() !== formatted.trim()) {
-      code.value = formatted
-      ElMessage.success('代码格式化成功')
+    // 尝试获取并运行 Monaco 的格式化 action
+    const action = editor.value.getAction && editor.value.getAction('editor.action.formatDocument')
+    if (action && typeof action.run === 'function') {
+      await action.run()
+      ElMessage.success('代码格式化完成')
     } else {
-      ElMessage.info('代码已经是格式化的了')
+      // 某些封装或语言服务下 action 可能不可用
+      // 尝试触发内置 formatting via executeEdits / language service - 如果不可用则提示
+      ElMessage.warning('格式化操作当前不可用')
+      console.warn('Monaco format action not available on this editor instance', editor.value)
     }
   } catch (err) {
-    console.error('格式化错误:', err)
+    console.error('Monaco 格式化失败:', err)
     ElMessage.error('格式化失败')
   }
 }
